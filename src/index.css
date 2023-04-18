@@ -16,3 +16,7 @@
 body {
     -webkit-app-region: drag;
 }
+
+button, a {
+    -webkit-app-region: no-drag;
+}
