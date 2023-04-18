@@ -9,7 +9,7 @@ import { createRoot } from 'react-dom/client';
 
 // render();
 
-import Home from "./views/Home.jsx"
+import Router from "./views/Router.jsx"
 
 const root = createRoot(document.getElementById('app'));
-root.render(<Home />);
+root.render(<Router />);
