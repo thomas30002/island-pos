@@ -12,3 +12,7 @@
         font-family: 'PlusJakartaSans', system-ui, sans-serif;
     }
 }
+
+body {
+    -webkit-app-region: drag;
+}
