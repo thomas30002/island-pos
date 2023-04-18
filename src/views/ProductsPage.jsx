@@ -2,6 +2,6 @@ import React from 'react'
 
 export default function ProductsPage() {
   return (
-    <div>ProductsPage</div>
+    <div className='px-8 py-6'>ProductsPage</div>
   )
 }

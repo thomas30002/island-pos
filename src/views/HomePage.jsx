@@ -3,7 +3,7 @@ import Search from '../components/Search.jsx'
 
 export default function HomePage() {
   return (
-    <div>
+    <div className='px-8 py-6'>
       <div className='fixed right-8 top-6'>
         <Search />
       </div>

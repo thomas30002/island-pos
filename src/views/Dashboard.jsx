@@ -10,9 +10,7 @@ export default function Dashboard() {
       <Navbar/>
       {/* navbar */}
 
-      <div className='px-8 py-6'>
-        <Outlet/>
-      </div>
+      <Outlet/>
     </div>
   )
 }

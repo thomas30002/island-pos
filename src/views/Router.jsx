@@ -11,6 +11,13 @@ import DiscountPage from "./DiscountPage.jsx";
 import ReportsPage from "./ReportsPage.jsx";
 import SettingsPage from "./SettingsPage.jsx";
 
+import SettingFeaturesPage from "./settings_pages/Features.jsx";
+import SettingPaymentTypePage from "./settings_pages/PaymentType.jsx";
+import SettingReceiptPage from "./settings_pages/Receipt.jsx";
+import SettingTaxesPage from "./settings_pages/Taxes.jsx";
+import SettingDiningOptionsPage from "./settings_pages/DiningOptions.jsx";
+
+
 export default function RouterPage() {
   return (
     <div>
@@ -25,7 +32,14 @@ export default function RouterPage() {
             <Route path='expenses' element={<ExpensesPage />} />
             <Route path='discount' element={<DiscountPage />} />
             <Route path='reports' element={<ReportsPage />} />
-            <Route path='settings' element={<SettingsPage />} />
+            <Route path='settings' element={<SettingsPage />} >
+              <Route path='' element={<SettingFeaturesPage />} />
+              <Route path='features' element={<SettingFeaturesPage />} />
+              <Route path='payment-type' element={<SettingPaymentTypePage />} />
+              <Route path='taxes' element={<SettingTaxesPage />} />
+              <Route path='receipt' element={<SettingReceiptPage />} />
+              <Route path='dining-options' element={<SettingDiningOptionsPage />} />
+            </Route>
 
           </Route>
         </Routes>

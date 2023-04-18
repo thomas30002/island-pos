@@ -2,6 +2,6 @@ import React from 'react'
 
 export default function DiscountPage() {
   return (
-    <div>DiscountPage</div>
+    <div className='px-8 py-6'>DiscountPage</div>
   )
 }

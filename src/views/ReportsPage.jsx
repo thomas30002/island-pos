@@ -2,6 +2,6 @@ import React from 'react'
 
 export default function ReportsPage() {
   return (
-    <div>ReportsPage</div>
+    <div className='px-8 py-6'>ReportsPage</div>
   )
 }
