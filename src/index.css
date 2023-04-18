@@ -17,6 +17,28 @@ body {
     -webkit-app-region: drag;
 }
 
-button, a {
+button, a, .no-drag {
     -webkit-app-region: no-drag;
+}
+
+/* width */
+::-webkit-scrollbar {
+    width: 4px;
+    display: none;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+    background: #d1d1d1;
+    border-radius: 999px;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+    background: #b7b7b7;
 }

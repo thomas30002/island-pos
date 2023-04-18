@@ -53,7 +53,7 @@ export default function Navbar() {
   console.log(pathname);
 
   return (
-    <div className='h-screen w-72 px-8 py-8 border-r border-r-ipos-grey-100'>
+    <div className='h-screen w-72 px-8 py-8 border-r border-r-ipos-grey-100 overflow-y-scroll'>
       <img src={logo} alt="logo" className='w-40' />
 
       <div className="mt-6 flex flex-col gap-4">
