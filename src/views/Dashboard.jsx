@@ -7,10 +7,14 @@ export default function Dashboard() {
   return (
     <div className='w-full flex flex-row'>
       {/* navbar */}
-      <Navbar/>
+      <div>
+        <Navbar/>
+      </div>
       {/* navbar */}
 
-      <Outlet/>
+      <div className='w-full'>
+        <Outlet/>
+      </div>
     </div>
   )
 }
