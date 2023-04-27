@@ -17,7 +17,11 @@ body {
     -webkit-app-region: drag;
 }
 
-button, a, .no-drag {
+.drag {
+    -webkit-app-region: drag;
+}
+
+button, a, select, option, .no-drag {
     -webkit-app-region: no-drag;
 }
 

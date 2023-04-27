@@ -35,7 +35,7 @@ export default function SettingsNavbar() {
   const {pathname} = useLocation();
 
   return (
-    <div className='h-screen w-72 px-8 py-8 border-r border-r-ipos-grey-100 overflow-y-scroll'>
+    <div className='h-screen w-72 px-8 py-8 bg-white border-r border-r-ipos-grey-100 overflow-y-scroll'>
 
       <div className="mt-16 flex flex-col gap-4">
       {
