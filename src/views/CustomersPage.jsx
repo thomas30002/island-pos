@@ -18,12 +18,12 @@ export default function CustomersPage() {
         <table className='w-full border-collapse'>
           <thead>
             <tr className='border-b border-b-ipos-grey-100'>
-              <th className='py-3 pl-4 text-left'>#</th>
-              <th className='py-3 text-left'>Customer Name</th>
-              <th className='py-3 text-left'>Email</th>
-              <th className='py-3 text-left'>Phone</th>
-              <th className='py-3 text-left'>Address</th>
-              <th className='py-3 text-left'>Action</th>
+              <th className='py-3 font-normal pl-4 text-left'>#</th>
+              <th className='py-3 font-normal text-left'>Customer Name</th>
+              <th className='py-3 font-normal text-left'>Email</th>
+              <th className='py-3 font-normal text-left'>Phone</th>
+              <th className='py-3 font-normal text-left'>Address</th>
+              <th className='py-3 font-normal text-left'>Action</th>
             </tr>
           </thead>
           <tbody>
