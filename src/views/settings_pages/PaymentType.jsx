@@ -50,6 +50,17 @@ export default function PaymentType() {
     setShowAddModal(false);
   }
 
+  const btnRemovePaymentType = async id => {
+    try {
+      const res = await window.api.removePaymentType(id);
+      await _getAllPaymentTypes();
+      toast.success("Payment Type removed.")
+    } catch (error) {
+      console.error(error);
+      toast.error("Something went wrong while saving details!");
+    }
+  };
+
   return (
     <div className='px-8 py-6'>
       <div className="w-full flex mt-4 justify-between items-center">
@@ -65,7 +76,9 @@ export default function PaymentType() {
           return (
             <div key={paymentType.id} className="pt-3 flex items-center justify-between">
               <p>{index+1}. {paymentType.name}</p>
-              <button className='text-red-500 hover:text-red-400'>
+              <button onClick={()=>{
+                btnRemovePaymentType(paymentType.id)
+              }} className='text-red-500 hover:text-red-400'>
                 <IconTrash />
               </button>
             </div>
