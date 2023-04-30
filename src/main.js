@@ -14,6 +14,8 @@ const createWindow = () => {
     icon: '/assets/images/icon.png',
     webPreferences: {
       preload: MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY,
+      contextIsolation: false,
+      nodeIntegration: true
     },
     titleBarStyle: "hidden",
   });
