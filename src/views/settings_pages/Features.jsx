@@ -1,13 +1,52 @@
 import { IconBox, IconDatabaseExport, IconDatabaseImport, IconVolume } from '@tabler/icons-react'
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { playTapSound } from '../../utils/playTapSound'
+import { getFeatures, saveFeatures } from '../../backend/controllers/features.controller';
 
 export default function Features() {
+
+  const [state, setState] = useState({
+    posTapSound: true,
+    diningOptions: false,
+  })
+
+  useEffect(()=>{
+    const features = getFeatures();
+    setState({
+      posTapSound: features?.posTapSound || false,
+      diningOptions: features?.diningOptions || false,
+    })
+  },[]);
 
   const btnPOSTapSoundSwitch = (e) => {
     if(e.target.checked) {
       playTapSound();
+      
     }
+    // 
+    saveFeatures({
+      posTapSound: e.target.checked,
+      diningOptions: state.diningOptions,
+    });
+
+    setState({
+      ...state,
+      posTapSound: e.target.checked,
+    });
+  }
+
+  const diningOptionSwitch = (e) => {
+    
+    // 
+    saveFeatures({
+      posTapSound: state.posTapSound,
+      diningOptions: e.target.checked,
+    });
+    
+    setState({
+      ...state,
+      diningOptions: e.target.checked,
+    });
   }
 
   return (
@@ -31,7 +70,7 @@ export default function Features() {
           </div>
           <div>
             <label className="relative inline-flex items-center cursor-pointer no-drag">
-              <input onChange={btnPOSTapSoundSwitch} type="checkbox" value="" className="sr-only peer" />
+              <input checked={state.posTapSound} onChange={btnPOSTapSoundSwitch} type="checkbox" value="" className="sr-only peer" />
               <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-indigo-300 rounded-full peer dark:bg-gray-300 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-ipos-blue"></div>
             </label>
           </div>
@@ -54,7 +93,7 @@ export default function Features() {
           </div>
           <div>
             <label className="relative inline-flex items-center cursor-pointer no-drag">
-              <input type="checkbox" value="" className="sr-only peer" />
+              <input checked={state.diningOptions} onChange={diningOptionSwitch} type="checkbox" value="" className="sr-only peer" />
               <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-indigo-300 rounded-full peer dark:bg-gray-300 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-ipos-blue"></div>
             </label>
           </div>
