@@ -1,6 +1,7 @@
 import { IconInfoSquareRounded, IconPencil, IconPhoto, IconTrash, IconUser } from '@tabler/icons-react'
 import React, { useEffect, useState } from 'react'
 import { toast } from 'react-hot-toast';
+import { CURRENCIES } from "../../config/currencies.config"
 
 export default function Receipt() {
 
@@ -135,6 +136,16 @@ export default function Receipt() {
       <div className="w-full mt-2 no-drag">
         <label htmlFor="receiptFooter" className='block w-full'>Footer</label>
         <textarea value={footer} onChange={handleOnFooterChange} className='outline-none w-full h-28 mt-2 bg-ipos-grey-50 placeholder::text-ipos-grey px-4 py-3 rounded-2xl' name="receiptFooter" id="receiptFooter" placeholder='Enter Footer Text to include in receipt'></textarea>
+      </div>
+
+      <div className="w-full mt-4 no-drag">
+        <label htmlFor="currency" className='block w-full'>Currency</label>
+        <select name="currency" id="currency" placeholder='Select Currency' className='outline-none w-full mt-2 bg-ipos-grey-50 placeholder::text-ipos-grey px-4 py-3 rounded-2xl'>
+          <option value="">Select Currency</option>
+          {
+            CURRENCIES.map((c,index)=><option key={index} value={c.cc}>{c.name} ({c.symbol})</option>)
+          }
+        </select>
       </div>
 
       <div className='mt-4 w-full flex items-center justify-between bg-ipos-grey-50 rounded-2xl px-6 py-4'>
