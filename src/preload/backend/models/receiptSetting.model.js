@@ -2,10 +2,8 @@ import {sequelize} from "../database";
 import { DataTypes } from 'sequelize'
 
 export const ReceiptSetting = sequelize.define('ReceiptSetting', {
-    id: {
-        type: DataTypes.INTEGER,
-        primaryKey: true,
-        allowNull: false,
+    settingid: {
+        type: DataTypes.INTEGER
     },
     header: {
         type: DataTypes.TEXT,
