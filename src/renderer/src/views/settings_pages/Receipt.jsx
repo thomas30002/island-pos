@@ -1,4 +1,4 @@
-import { IconInfoSquareRounded, IconPencil, IconPhoto, IconUser } from '@tabler/icons-react'
+import { IconInfoSquareRounded, IconPencil, IconPhoto, IconTrash, IconUser } from '@tabler/icons-react'
 import React, { useEffect, useState } from 'react'
 import { toast } from 'react-hot-toast';
 
