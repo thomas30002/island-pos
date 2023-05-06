@@ -19,5 +19,8 @@ export const ReceiptSetting = sequelize.define('ReceiptSetting', {
     },
     showComments: {
         type: DataTypes.BOOLEAN
+    },
+    currency: {
+        type: DataTypes.STRING
     }
 })

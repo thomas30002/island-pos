@@ -5,9 +5,9 @@ import { CURRENCIES } from "../../config/currencies.config"
 
 export default function Receipt() {
 
-  const [state, setState] = useState({header: '', footer: '', showCustomerInfo: false, showComments: false, logo: ''});   
+  const [state, setState] = useState({header: '', footer: '', showCustomerInfo: false, showComments: false, logo: '', currency: ''});   
   
-  const {header, footer, showComments, showCustomerInfo, logo} = state;
+  const {header, footer, showComments, showCustomerInfo, logo, currency} = state;
   
   useEffect(()=>{
     _getReceiptSettings();
@@ -22,11 +22,12 @@ export default function Receipt() {
         console.log(res.dataValues);
         setState({
           ...state,
-          header: res.dataValues.header,
-          footer: res.dataValues.footer,
-          showComments: res.dataValues.showComments,
-          showCustomerInfo: res.dataValues.showCustomerInfo,
-          logo: res.dataValues.logo,
+          header: res.dataValues.header || "",
+          footer: res.dataValues.footer || "",
+          showComments: res.dataValues.showComments || false,
+          showCustomerInfo: res.dataValues.showCustomerInfo || false,
+          logo: res.dataValues.logo || null,
+          currency: res.dataValues.currency || ""
         })
       }
     } catch (error) { 
@@ -114,6 +115,25 @@ export default function Receipt() {
     }
   }
 
+  const handleOnCurrencyChange = async e => {
+    const change = e.target.value;
+
+    try {
+      const res = await window.api.saveReceiptSettings({
+        header, footer, showCustomerInfo, logo,
+        showComments, currency: change
+      });
+
+      setState({
+        ...state,
+        currency: change,
+      });
+    } catch (error) {
+      console.log(error);
+      toast.error("Unable to save details!");
+    }
+  }
+
   return (
     <div className='px-8 py-6'>
 
@@ -140,7 +160,7 @@ export default function Receipt() {
 
       <div className="w-full mt-4 no-drag">
         <label htmlFor="currency" className='block w-full'>Currency</label>
-        <select name="currency" id="currency" placeholder='Select Currency' className='outline-none w-full mt-2 bg-ipos-grey-50 placeholder::text-ipos-grey px-4 py-3 rounded-2xl'>
+        <select value={currency} onChange={handleOnCurrencyChange} name="currency" id="currency" placeholder='Select Currency' className='outline-none w-full mt-2 bg-ipos-grey-50 placeholder::text-ipos-grey px-4 py-3 rounded-2xl'>
           <option value="">Select Currency</option>
           {
             CURRENCIES.map((c,index)=><option key={index} value={c.cc}>{c.name} ({c.symbol})</option>)

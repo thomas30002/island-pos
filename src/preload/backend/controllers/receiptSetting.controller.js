@@ -9,7 +9,7 @@ export const getReceiptSettings = async () => {
     return res;
 }
 
-export const saveReceiptSettings = async ({header, footer, showCustomerInfo, showComments, logo}) => {
+export const saveReceiptSettings = async ({header, footer, showCustomerInfo, showComments, logo, currency}) => {
     const settings = await ReceiptSetting.findOne({
         where: {
             settingid: 1
@@ -21,7 +21,8 @@ export const saveReceiptSettings = async ({header, footer, showCustomerInfo, sho
             header, footer,
             showCustomerInfo,
             showComments,
-            logo
+            logo,
+            currency
         });
     } else {
         return await ReceiptSetting.create({
@@ -29,7 +30,8 @@ export const saveReceiptSettings = async ({header, footer, showCustomerInfo, sho
             header, footer,
             showCustomerInfo,
             showComments,
-            logo
+            logo,
+            currency
         });
     }
 
