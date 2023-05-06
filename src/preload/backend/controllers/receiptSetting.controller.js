@@ -1,5 +1,7 @@
 import { ReceiptSetting } from "../models/receiptSetting.model.js"
 
+const CURRENCY_SETTING_KEY = "ipos-currency";
+
 export const getReceiptSettings = async () => {
     const res = await ReceiptSetting.findOne({
         where: {
@@ -36,4 +38,15 @@ export const saveReceiptSettings = async ({header, footer, showCustomerInfo, sho
     }
 
     
+}
+
+
+
+export const getCurrency = () => {
+    const currency = localStorage.getItem(CURRENCY_SETTING_KEY) || "";
+    return currency;
+}
+
+export const setCurrency = (currency) => {
+    localStorage.setItem(CURRENCY_SETTING_KEY, currency);
 }

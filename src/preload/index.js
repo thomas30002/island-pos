@@ -4,7 +4,7 @@ import { electronAPI } from '@electron-toolkit/preload'
 import {addPaymentType,getPaymentTypes, removePaymentType} from "./backend/controllers/paymentType.controller"
 import {addTax,getTaxes, removeTax} from "./backend/controllers/taxes.controller"
 import {addDiningOption,getDiningOptions,removeDiningOption} from "./backend/controllers/diningOptions.controller"
-import {getReceiptSettings,saveReceiptSettings} from "./backend/controllers/receiptSetting.controller"
+import {getReceiptSettings,saveReceiptSettings, getCurrency, setCurrency} from "./backend/controllers/receiptSetting.controller"
 import {addDiscount,getDiscounts,removeDiscount} from "./backend/controllers/discount.controller"
 
 // Custom APIs for renderer
@@ -34,6 +34,8 @@ const api = {
   // receipt settings
   getReceiptSettings,
   saveReceiptSettings,
+  getCurrency,
+  setCurrency,
   // receipt settings
 
   // discount

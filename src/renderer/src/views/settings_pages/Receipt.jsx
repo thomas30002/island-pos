@@ -5,7 +5,9 @@ import { CURRENCIES } from "../../config/currencies.config"
 
 export default function Receipt() {
 
-  const [state, setState] = useState({header: '', footer: '', showCustomerInfo: false, showComments: false, logo: '', currency: ''});   
+  const currencyFromStorage = window.api.getCurrency();
+
+  const [state, setState] = useState({header: '', footer: '', showCustomerInfo: false, showComments: false, logo: '', currency: currencyFromStorage});   
   
   const {header, footer, showComments, showCustomerInfo, logo, currency} = state;
   
@@ -27,7 +29,6 @@ export default function Receipt() {
           showComments: res.dataValues.showComments || false,
           showCustomerInfo: res.dataValues.showCustomerInfo || false,
           logo: res.dataValues.logo || null,
-          currency: res.dataValues.currency || ""
         })
       }
     } catch (error) { 
@@ -118,20 +119,26 @@ export default function Receipt() {
   const handleOnCurrencyChange = async e => {
     const change = e.target.value;
 
-    try {
-      const res = await window.api.saveReceiptSettings({
-        header, footer, showCustomerInfo, logo,
-        showComments, currency: change
-      });
+    window.api.setCurrency(change);
+    setState({
+      ...state,
+      currency: change,
+    })
 
-      setState({
-        ...state,
-        currency: change,
-      });
-    } catch (error) {
-      console.log(error);
-      toast.error("Unable to save details!");
-    }
+    // try {
+    //   const res = await window.api.saveReceiptSettings({
+    //     header, footer, showCustomerInfo, logo,
+    //     showComments, currency: change
+    //   });
+
+    //   setState({
+    //     ...state,
+    //     currency: change,
+    //   });
+    // } catch (error) {
+    //   console.log(error);
+    //   toast.error("Unable to save details!");
+    // }
   }
 
   return (
