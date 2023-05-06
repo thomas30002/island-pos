@@ -3,6 +3,7 @@ import Search from '../components/Search.jsx'
 import { IconPlus, IconTrash, IconX, IconDotsVertical } from '@tabler/icons-react'
 import { toast } from 'react-hot-toast'
 import {DISCOUNT_TYPE} from '../config/discountType.config.js'
+import { CURRENCIES } from "../config/currencies.config.js";
 import { Menu, Transition } from '@headlessui/react'
 
 function classNames(...classes) {
@@ -55,6 +56,14 @@ export default function DiscountPage() {
   const txtDiscountCodeRef = useRef(null)
   const txtDiscountValueRef = useRef(null)
   const txtDiscountTypeRef = useRef(null)
+
+
+  // get currency
+  const currencyCode = window.api.getCurrency();
+  const currencyFind =  CURRENCIES.find(c=>c.cc == currencyCode);
+  const currencySymbol = currencyFind !== undefined ? currencyFind.symbol : '';
+  // get currency
+
 
   useEffect(() => {
     _getAllDiscounts()
@@ -151,7 +160,7 @@ export default function DiscountPage() {
                   <td className="py-3">{discountCode}</td>
                   <td className="py-3">
                     {
-                      discountType === DISCOUNT_TYPE.FIXED ? `${discountValue}₹`:`${discountValue}%`
+                      discountType === DISCOUNT_TYPE.FIXED ? `${discountValue}${currencySymbol}`:`${discountValue}%`
                     }
                   </td>
                   <td className="py-3">{discountType}</td>
