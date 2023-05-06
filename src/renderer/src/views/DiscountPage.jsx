@@ -1,8 +1,52 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useRef, useState, Fragment } from 'react'
 import Search from '../components/Search.jsx'
 import { IconPlus, IconTrash, IconX, IconDotsVertical } from '@tabler/icons-react'
 import { toast } from 'react-hot-toast'
 import {DISCOUNT_TYPE} from '../config/discountType.config.js'
+import { Menu, Transition } from '@headlessui/react'
+
+function classNames(...classes) {
+  return classes.filter(Boolean).join(' ')
+}
+
+function OptionsMenu({onBtnDelete}) {
+  return <Menu as="div" className="relative inline-block text-left">
+  <div>
+    <Menu.Button className="inline-flex w-full justify-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50">
+      Options
+      <IconDotsVertical className="-mr-1 h-5 w-5 text-gray-400" aria-hidden="true" />
+    </Menu.Button>
+  </div>
+
+  <Transition
+    as={Fragment}
+    enter="transition ease-out duration-100"
+    enterFrom="transform opacity-0 scale-95"
+    enterTo="transform opacity-100 scale-100"
+    leave="transition ease-in duration-75"
+    leaveFrom="transform opacity-100 scale-100"
+    leaveTo="transform opacity-0 scale-95"
+  >
+    <Menu.Items className="absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+      <div className="py-1">
+        <Menu.Item>
+          {({ active }) => (
+            <button
+            onClick={onBtnDelete}
+              className={classNames(
+                active ? 'bg-gray-100 text-gray-900' : 'text-gray-700',
+                'block px-4 py-2 text-sm text-left w-full'
+              )}
+            >
+              Delete
+            </button>
+          )}
+        </Menu.Item>
+      </div>
+    </Menu.Items>
+  </Transition>
+</Menu>;
+}
 
 export default function DiscountPage() {
   const [showAddModal, setShowAddModal] = useState(false)
@@ -60,6 +104,17 @@ export default function DiscountPage() {
     setShowAddModal(false)
   }
 
+  const btnDeleteDiscount = async discountCode => {
+    try {
+      const res = await window.api.removeDiscount(discountCode);
+      await _getAllDiscounts();
+      toast.success("Discount Removed.");
+    } catch (error) {
+      console.error(error)
+      toast.error('Something went wrong while deleting!')
+    }
+  };
+
   return (
     <div className="py-6">
       <div className="px-8 pb-2 flex items-center justify-end gap-4 border-b border-ipos-grey-100">
@@ -86,28 +141,6 @@ export default function DiscountPage() {
             </tr>
           </thead>
           <tbody>
-            {/* <tr className='border-b border-b-ipos-grey-100'>
-              <td className='py-3 pl-4'>1</td>
-              <td className='py-3'>500RS</td>
-              <td className='py-3'>500₹</td>
-              <td className='py-3'>Amount</td>
-              <td className='py-3'>
-                <button>
-                  <IconDotsVertical />
-                </button>
-              </td>
-            </tr>
-            <tr className='border-b border-b-ipos-grey-100'>
-              <td className='py-3 pl-4'>2</td>
-              <td className='py-3'>DISC50</td>
-              <td className='py-3'>50%</td>
-              <td className='py-3'>Percentage</td>
-              <td className='py-3'>
-                <button>
-                  <IconDotsVertical />
-                </button>
-              </td>
-            </tr> */}
             {discounts.map((discount, index) => {
               const discountCode = discount.dataValues.discountCode;
               const discountValue =  discount.dataValues.discountValue;
@@ -123,9 +156,9 @@ export default function DiscountPage() {
                   </td>
                   <td className="py-3">{discountType}</td>
                   <td className="py-3">
-                    <button>
-                      <IconDotsVertical />
-                    </button>
+                    <OptionsMenu onBtnDelete={()=>{
+                      btnDeleteDiscount(discountCode);
+                    }} />
                   </td>
                 </tr>
               )
