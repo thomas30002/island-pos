@@ -179,7 +179,7 @@ export default function CustomersPage() {
                   <td className="py-3">{address}</td>
                   <td className="py-3">
                     <OptionsMenu onBtnDelete={()=>{
-                      // btnDeleteCustomer(id);
+                      btnDeleteCustomer(id);
                     }} />
                   </td>
                 </tr>
