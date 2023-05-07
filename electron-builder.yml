@@ -1,5 +1,5 @@
-appId: com.electron.app
-productName: test-electron-vite
+appId: com.islandpos.app
+productName: ipos
 directories:
   buildResources: build
 files:
@@ -12,7 +12,7 @@ asarUnpack:
   - resources/**
 afterSign: build/notarize.js
 win:
-  executableName: test-electron-vite
+  executableName: ipos
 nsis:
   artifactName: ${name}-${version}-setup.${ext}
   shortcutName: ${productName}

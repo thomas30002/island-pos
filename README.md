@@ -1,4 +1,4 @@
-# test-electron-vite
+# iPOS - Island POS
 
 An Electron application with React
 
