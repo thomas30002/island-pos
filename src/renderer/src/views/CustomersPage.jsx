@@ -10,7 +10,7 @@ function classNames(...classes) {
   return classes.filter(Boolean).join(' ')
 }
 
-function OptionsMenu({ onBtnDelete }) {
+function OptionsMenu({ onBtnDelete, onBtnUpdate, onBtnView }) {
   return (
     <Menu as="div" className="relative inline-block text-left">
       <div>
@@ -30,6 +30,37 @@ function OptionsMenu({ onBtnDelete }) {
         leaveTo="transform opacity-0 scale-95"
       >
         <Menu.Items className="absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+          
+          <div className="py-1">
+            <Menu.Item>
+              {({ active }) => (
+                <button
+                  onClick={onBtnView}
+                  className={classNames(
+                    active ? 'bg-gray-100 text-gray-900' : 'text-gray-700',
+                    'block px-4 py-2 text-sm text-left w-full'
+                  )}
+                >
+                  View
+                </button>
+              )}
+            </Menu.Item>
+          </div>
+          <div className="py-1">
+            <Menu.Item>
+              {({ active }) => (
+                <button
+                  onClick={onBtnUpdate}
+                  className={classNames(
+                    active ? 'bg-gray-100 text-gray-900' : 'text-gray-700',
+                    'block px-4 py-2 text-sm text-left w-full'
+                  )}
+                >
+                  Update
+                </button>
+              )}
+            </Menu.Item>
+          </div>
           <div className="py-1">
             <Menu.Item>
               {({ active }) => (
@@ -37,7 +68,7 @@ function OptionsMenu({ onBtnDelete }) {
                   onClick={onBtnDelete}
                   className={classNames(
                     active ? 'bg-gray-100 text-gray-900' : 'text-gray-700',
-                    'block px-4 py-2 text-sm text-left w-full'
+                    'block px-4 py-2 text-sm text-left w-full text-red-500'
                   )}
                 >
                   Delete
@@ -144,7 +175,7 @@ export default function CustomersPage() {
               <th className="py-3 font-normal text-left">Customer Name</th>
               <th className="py-3 font-normal text-left">Email</th>
               <th className="py-3 font-normal text-left">Phone</th>
-              <th className="py-3 font-normal text-left">Address</th>
+              <th className="py-3 font-normal text-left max-w-[218px]">Address</th>
               <th className="py-3 font-normal text-left">Action</th>
             </tr>
           </thead>
@@ -176,11 +207,19 @@ export default function CustomersPage() {
                   <td className="py-3">{name}</td>
                   <td className="py-3">{email}</td>
                   <td className="py-3">{phone}</td>
-                  <td className="py-3">{address}</td>
+                  <td className="py-3 max-w-[218px] overflow-hidden text-ellipsis whitespace-nowrap">{address}</td>
                   <td className="py-3">
-                    <OptionsMenu onBtnDelete={()=>{
+                    <OptionsMenu 
+                    onBtnDelete={()=>{
                       btnDeleteCustomer(id);
-                    }} />
+                    }} 
+                    onBtnUpdate={()=>{
+
+                    }}
+                    onBtnView={()=>{
+                      
+                    }}
+                    />
                   </td>
                 </tr>
               })
