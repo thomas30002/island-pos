@@ -155,7 +155,7 @@ export default function ExpensesPage() {
               <th className='py-3 text-left w-80'>Expense Name</th>
               <th className='py-3 text-left'>Amount</th>
               <th className='py-3 text-left'>Date</th>
-              <th className='py-3 text-left w-52'>Notes</th>
+              <th className='py-3 text-left max-w-[148px]'>Notes</th>
               <th className='py-3 text-left'>Action</th>
             </tr>
           </thead>
@@ -177,7 +177,7 @@ export default function ExpensesPage() {
                   <td className='py-3 w-80'>{name}</td>
                   <td className='py-3'>{amount}{currencySymbol}</td>
                   <td className='py-3'>{dateStr}</td>
-                  <td className="py-3">{notes}</td>
+                  <td className="py-3 max-w-[148px] overflow-hidden text-ellipsis whitespace-nowrap">{notes}</td>
                   <td className='py-3'>
                     <OptionsMenu onBtnDelete={()=>{
                       btnDeleteExpense(id);
