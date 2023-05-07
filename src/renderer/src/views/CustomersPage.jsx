@@ -75,7 +75,7 @@ export default function CustomersPage() {
     }
   }
 
-  const btnAddExpense = () => {
+  const btnAddCustomer = () => {
     setShowAddModal(true)
   }
 
@@ -126,7 +126,7 @@ export default function CustomersPage() {
     <div className="py-6">
       <div className="px-8 pb-2 flex items-center justify-end gap-4 border-b border-ipos-grey-100">
         <button
-          onClick={btnAddExpense}
+          onClick={btnAddCustomer}
           className="flex items-center gap-2 bg-ipos-blue hover:bg-indigo-700 transition text-white px-4 py-3 rounded-2xl"
         >
           <IconPlus />
@@ -149,7 +149,7 @@ export default function CustomersPage() {
             </tr>
           </thead>
           <tbody>
-            <tr className="border-b border-b-ipos-grey-100">
+            {/* <tr className="border-b border-b-ipos-grey-100">
               <td className="py-3 pl-4">1</td>
               <td className="py-3">Alisa Tin</td>
               <td className="py-3">alisa@mail.com</td>
@@ -160,31 +160,32 @@ export default function CustomersPage() {
                   <IconDotsVertical />
                 </button>
               </td>
-            </tr>
-            <tr className="border-b border-b-ipos-grey-100">
-              <td className="py-3 pl-4">2</td>
-              <td className="py-3">Isaac Wisozk</td>
-              <td className="py-3">Delfina_Hermann11@gmail.com</td>
-              <td className="py-3">984-776-7480</td>
-              <td className="py-3">658 Koelpin Expressway</td>
-              <td className="py-3">
-                <button>
-                  <IconDotsVertical />
-                </button>
-              </td>
-            </tr>
-            <tr className="border-b border-b-ipos-grey-100">
-              <td className="py-3 pl-4">3</td>
-              <td className="py-3">Alisa Tin</td>
-              <td className="py-3">alisa@mail.com</td>
-              <td className="py-3">984-776-7480</td>
-              <td className="py-3">3f, New BI Tower, NY, USA 30011</td>
-              <td className="py-3">
-                <button>
-                  <IconDotsVertical />
-                </button>
-              </td>
-            </tr>
+            </tr> */}
+
+            {
+              customers.map((customer, index)=>{
+
+                const id = customer.dataValues.id;
+                const name = customer.dataValues.name || "";
+                const phone = customer.dataValues.phone || "";
+                const email = customer.dataValues.email || "";
+                const address = customer.dataValues.address || "";
+
+                return <tr key={index} className='border-b border-b-ipos-grey-100'>
+                  <td className="py-3 pl-4">{id}</td>
+                  <td className="py-3">{name}</td>
+                  <td className="py-3">{email}</td>
+                  <td className="py-3">{phone}</td>
+                  <td className="py-3">{address}</td>
+                  <td className="py-3">
+                    <OptionsMenu onBtnDelete={()=>{
+                      // btnDeleteCustomer(id);
+                    }} />
+                  </td>
+                </tr>
+              })
+            }
+            
           </tbody>
         </table>
 
