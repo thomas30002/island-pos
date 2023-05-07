@@ -3,7 +3,6 @@ import Search from '../components/Search.jsx'
 import { IconDotsVertical, IconPlus, IconTrash, IconX } from '@tabler/icons-react'
 
 import { toast } from 'react-hot-toast'
-import {DISCOUNT_TYPE} from '../config/discountType.config.js'
 import { CURRENCIES } from "../config/currencies.config.js";
 import { Menu, Transition } from '@headlessui/react'
 

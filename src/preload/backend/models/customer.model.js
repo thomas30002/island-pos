@@ -12,9 +12,6 @@ export const Customer = sequelize.define('Customer', {
     },
     email: {
         type: DataTypes.STRING,
-        validate: {
-            isEmail
-        }
     },
     phone: {
         type: DataTypes.STRING,

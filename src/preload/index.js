@@ -11,9 +11,6 @@ import { addCustomer,getCustomer, getCustomers, removeCustomer,updateCustomer } 
 
 // Custom APIs for renderer
 const api = {
-  helloworld: ()=>{
-    console.log("Hello world from API");
-  },
 
   // payment types
   addPaymentType,
