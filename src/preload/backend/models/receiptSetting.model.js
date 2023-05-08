@@ -12,7 +12,7 @@ export const ReceiptSetting = sequelize.define('ReceiptSetting', {
         type: DataTypes.TEXT,
     },
     logo: {
-        type: DataTypes.BLOB
+        type: DataTypes.TEXT,
     },
     showCustomerInfo: {
         type: DataTypes.BOOLEAN

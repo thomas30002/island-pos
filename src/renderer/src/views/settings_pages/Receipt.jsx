@@ -2,6 +2,7 @@ import { IconInfoSquareRounded, IconPencil, IconPhoto, IconTrash, IconUser } fro
 import React, { useEffect, useState } from 'react'
 import { toast } from 'react-hot-toast';
 import { CURRENCIES } from "../../config/currencies.config"
+import { blobToBase64 } from "../../utils/blobToBase64";
 
 export default function Receipt() {
 
@@ -22,13 +23,20 @@ export default function Receipt() {
 
       if(res) {
         console.log(res.dataValues);
+
+        let logoUrl = '';
+
+        if(res.dataValues.logo != null && res.dataValues.logo != undefined && res.dataValues.logo != "") {
+          logoUrl = res.dataValues.logo;
+        }
+
         setState({
           ...state,
           header: res.dataValues.header || "",
           footer: res.dataValues.footer || "",
           showComments: res.dataValues.showComments || false,
           showCustomerInfo: res.dataValues.showCustomerInfo || false,
-          logo: res.dataValues.logo || null,
+          logo: logoUrl || null,
         })
       }
     } catch (error) { 
@@ -37,7 +45,49 @@ export default function Receipt() {
   };
 
   const btnEditLogo = async () => {
+    const imageCompression = await import('browser-image-compression');
+    
 
+    const input = document.createElement("input");
+    input.setAttribute("type", "file");
+    input.setAttribute("accept", "image/*");
+    input.addEventListener("change", async (e)=>{
+      // handle file
+      const imageFile = e.target.files[0];
+
+      const options = {
+        maxSizeMB: 1,
+        maxWidthOrHeight: 512,
+        useWebWorker: true
+      };
+
+      try {
+        const compressedFile = await imageCompression.default(imageFile, options);
+        // const url = URL.createObjectURL(compressedFile);
+        const url = await blobToBase64(compressedFile);
+
+        // save to DB
+        const res = await window.api.saveReceiptSettings({
+          header, footer, showCustomerInfo, logo:url,
+          showComments
+        });
+
+        setState({
+          ...state,
+          logo: url
+        });
+      } catch (error) {
+        console.log(error);
+      }
+
+
+    });
+
+    input.click();
+  };
+
+  const btnRemoveLogo = async () => {
+    // remove logo
   };
 
   const handleShowCommentsChange = async (e) => {
@@ -146,10 +196,28 @@ export default function Receipt() {
 
       <div className=' w-full flex flex-col items-center justify-center mt-8'>
         <div className='relative w-32 h-32 bg-ipos-grey-50 rounded-full flex items-center justify-center'>
-          <IconPhoto className='text-ipos-grey' />
+          
+          {
+            logo !== undefined && logo !== '' && logo !== null ? 
+              <img src={logo} alt="logo" className='w-32 h-32 object-cover rounded-full' />
+            :
+            <IconPhoto className='text-ipos-grey' />
+          }
+
           <button onClick={btnEditLogo} className="transition bg-white hover:bg-ipos-grey-100 shadow-lg rounded-full absolute bottom-0 right-0 flex items-center justify-center w-8 h-8 ">
             <IconPencil />
           </button>
+
+          {
+            logo !== undefined && logo !== '' && logo !== null ? 
+            <button onClick={btnRemoveLogo} className='absolute bottom-10 -right-4 w-8 h-8 rounded-full bg-red-50 hover:bg-red-100 transition text-red-600  items-center justify-center flex'>
+            <IconTrash />
+          </button>
+            :
+            <></>
+          }
+
+          
         </div>
         <p className='mt-4'>Logo</p>
       </div>
