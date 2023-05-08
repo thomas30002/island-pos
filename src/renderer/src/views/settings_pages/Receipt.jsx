@@ -88,6 +88,20 @@ export default function Receipt() {
 
   const btnRemoveLogo = async () => {
     // remove logo
+    try {
+      // save to DB
+      const res = await window.api.saveReceiptSettings({
+        header, footer, showCustomerInfo, logo: null,
+        showComments
+      });
+
+      setState({
+        ...state,
+        logo: null
+      });
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   const handleShowCommentsChange = async (e) => {
