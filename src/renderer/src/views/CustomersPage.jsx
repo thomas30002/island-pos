@@ -84,12 +84,21 @@ function OptionsMenu({ onBtnDelete, onBtnUpdate, onBtnView }) {
 
 export default function CustomersPage() {
   const [showAddModal, setShowAddModal] = useState(false)
+  const [showViewCustomerModal, setShowViewCustomerModal] = useState(false);
   const [customers, setCustomers] = useState([])
 
   const txtCustomerNameRef = useRef(null)
   const txtCustomerPhoneRef = useRef(null)
   const txtCustomerEmailRef = useRef(null)
   const txtCustomerAddressRef = useRef(null)
+
+
+  const txtViewCustomerIDRef = useRef(null)
+  const txtViewCustomerNameRef = useRef(null)
+  const txtViewCustomerPhoneRef = useRef(null)
+  const txtViewCustomerEmailRef = useRef(null)
+  const txtViewCustomerAddressRef = useRef(null)
+
 
   useEffect(() => {
     _getAllCustomers()
@@ -153,6 +162,63 @@ export default function CustomersPage() {
     }
   }
 
+  // 
+  // 
+  // view customer modal
+  const btnViewCustomer = (id, name, phone, email, address) => {
+    txtViewCustomerIDRef.current.value = id;
+    txtViewCustomerNameRef.current.value = name;
+    txtViewCustomerPhoneRef.current.value = phone;
+    txtViewCustomerEmailRef.current.value = email;
+    txtViewCustomerAddressRef.current.value = address;
+    setShowViewCustomerModal(true)
+  }
+
+  const closeViewCustomerModal = () => {
+    txtViewCustomerIDRef.current.value = '';
+    txtViewCustomerNameRef.current.value = '';
+    txtViewCustomerPhoneRef.current.value = '';
+    txtViewCustomerEmailRef.current.value = '';
+    txtViewCustomerAddressRef.current.value = '';
+    setShowViewCustomerModal(false)
+  }
+
+  const btnUpdateCustomer = async () => {
+    const id = txtViewCustomerIDRef.current.value;
+    const name = txtViewCustomerNameRef.current.value;
+    const phone = txtViewCustomerPhoneRef.current.value;
+    const email = txtViewCustomerEmailRef.current.value;
+    const address = txtViewCustomerAddressRef.current.value;
+    
+    if(!id) {
+      toast.error("Something went wrong! reopen the app!")
+      return;
+    }
+    if(!name) {
+      toast.error("Customer Name is mandatory!")
+      return;
+    }
+    if(!phone) {
+      toast.error("Customer Phone is mandatory!")
+      return;
+    }
+
+    try {
+      const res = await window.api.updateCustomer(id, name, email, phone, address);
+      await _getAllCustomers()
+      toast.success('Customer details updated.')
+    } catch (error) {
+      console.error(error)
+      toast.error('Something went wrong while saving details!')
+    }
+
+    setShowViewCustomerModal(false);
+  };
+  // view customer modal
+  // 
+  // 
+
+
   return (
     <div className="py-6">
       <div className="px-8 pb-2 flex items-center justify-end gap-4 border-b border-ipos-grey-100">
@@ -214,10 +280,10 @@ export default function CustomersPage() {
                       btnDeleteCustomer(id);
                     }} 
                     onBtnUpdate={()=>{
-
+                      btnViewCustomer(id, name, phone, email, address);
                     }}
                     onBtnView={()=>{
-                      
+                      btnViewCustomer(id, name, phone, email, address);
                     }}
                     />
                   </td>
@@ -338,6 +404,91 @@ export default function CustomersPage() {
         </div>
       </div>
       {/* modal */}
+
+      {/* view customer modal */}
+      <div
+        className={
+          showViewCustomerModal
+            ? 'w-96 rounded-2xl bg-white shadow-2xl fixed top-20 left-2/4 -translate-x-1/4 overflow-y-scroll px-4 py-3 mt-4 mr-4'
+            : 'hidden'
+        }
+      >
+        <input type="hidden" ref={txtViewCustomerIDRef} />
+        <div className="flex items-center gap-3 mt-4">
+          <button
+            onClick={closeViewCustomerModal}
+            className="w-12 h-12 flex items-center justify-center rounded-2xl bg-ipos-grey-50 hover:bg-ipos-grey-100 text-ipos-grey"
+          >
+            <IconX />
+          </button>
+          <h3>Customer Details</h3>
+        </div>
+
+        <div className="mt-6">
+          <label htmlFor="name" className="block w-full">
+            Customer Name
+          </label>
+          <input
+            ref={txtViewCustomerNameRef}
+            type="text"
+            id="name"
+            name="name"
+            placeholder="Write Customer Name here..."
+            className="block w-full px-4 py-3 bg-ipos-grey-50 rounded-2xl mt-1 outline-ipos-blue"
+          />
+
+          <label htmlFor="phone" className="mt-4 block w-full">
+            Phone
+          </label>
+          <input
+            ref={txtViewCustomerPhoneRef}
+            type="tel"
+            id="phone"
+            name="phone"
+            placeholder="Write Phone here..."
+            className="block w-full px-4 py-3 bg-ipos-grey-50 rounded-2xl mt-1 outline-ipos-blue"
+          />
+
+          <label htmlFor="email" className="mt-4 block w-full">
+            Email
+          </label>
+          <input
+            ref={txtViewCustomerEmailRef}
+            type="email"
+            id="email"
+            name="email"
+            placeholder="Write Email here..."
+            className="block w-full px-4 py-3 bg-ipos-grey-50 rounded-2xl mt-1 outline-ipos-blue"
+          />
+
+          <label htmlFor="address" className="mt-4 block w-full">
+            Address
+          </label>
+          <textarea
+            ref={txtViewCustomerAddressRef}
+            type="text"
+            id="address"
+            name="address"
+            placeholder="Write Address here..."
+            className="block w-full h-36 px-4 py-3 bg-ipos-grey-50 rounded-2xl mt-1 outline-ipos-blue"
+          />
+        </div>
+        <div className="mt-6">
+          <button
+            onClick={btnUpdateCustomer}
+            className="rounded-2xl px-4 py-3 bg-ipos-blue hover:bg-ipos-logo-color text-white"
+          >
+            Save
+          </button>
+          <button
+            onClick={closeViewCustomerModal}
+            className="rounded-2xl px-4 py-3 bg-ipos-grey-50 hover:bg-ipos-grey-100 text-ipos-grey ml-2"
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
+      {/* view customer modal */}
     </div>
   )
 }
