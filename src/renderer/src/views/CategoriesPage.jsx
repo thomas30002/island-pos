@@ -84,7 +84,22 @@ export default function CategoriesPage() {
         </button>
       </div>
 
-      
+      <div className="px-8 mt-8 w-full flex flex-col divide-y gap-4">
+        {categories.map((category,index)=>{
+          const id = category.dataValues.id;
+          const name = category.dataValues.name;
+          return (
+            <div key={index} className="pt-3 flex items-center justify-between">
+              <p>{index+1}. {name}</p>
+              <button onClick={()=>{
+                btnRemoveCategory(id)
+              }} className='text-red-500 hover:text-red-400'>
+                <IconTrash />
+              </button>
+            </div>
+          )
+        })}
+      </div>
 
       {/* modal */}
       <div
