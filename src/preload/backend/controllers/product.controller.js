@@ -13,7 +13,8 @@ export async function getProduct(id) {
     const res = await Product.findOne({
         where: {
             id
-        }
+        },
+        include: Category
     });
     return res;
 }
@@ -21,6 +22,26 @@ export async function getProduct(id) {
 export async function addProduct(name, price, cost, sku, barcode, soldby, image, CategoryId) {
     const res = await Product.create({
         name, price, cost, sku, barcode, soldby, image, CategoryId
+    });
+    return res;
+}
+
+export async function removeProduct(id) {
+    const res = await Product.destroy({
+        where: {
+            id
+        }
+    });
+    return res;
+}
+
+export async function updateProduct(id, name, price, cost, sku, barcode, soldby, image, CategoryId) {
+    const res = Product.update({
+        name, price, cost, sku, barcode, soldby, image, CategoryId,
+    }, {
+        where: {
+            id
+        }
     });
     return res;
 }

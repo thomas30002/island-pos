@@ -83,6 +83,77 @@ function OptionsMenu({onBtnPrintQR, onBtnExport, onBtnImport}) {
 </Menu>;
 }
 
+function ProductOptionsMenu({ onBtnDelete, onBtnUpdate, onBtnView }) {
+  return (
+    <Menu as="div" className="relative inline-block text-left">
+      <div>
+        <Menu.Button className="inline-flex justify-center rounded-md bg-white px-3 py-2 ">
+          <IconDotsVertical className="h-5 w-5" aria-hidden="true" />
+        </Menu.Button>
+      </div>
+
+      <Transition
+        as={Fragment}
+        enter="transition ease-out duration-100"
+        enterFrom="transform opacity-0 scale-95"
+        enterTo="transform opacity-100 scale-100"
+        leave="transition ease-in duration-75"
+        leaveFrom="transform opacity-100 scale-100"
+        leaveTo="transform opacity-0 scale-95"
+      >
+        <Menu.Items className="absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+          
+          <div className="py-1">
+            <Menu.Item>
+              {({ active }) => (
+                <button
+                  onClick={onBtnView}
+                  className={classNames(
+                    active ? 'bg-gray-100 text-gray-900' : 'text-gray-700',
+                    'block px-4 py-2 text-sm text-left w-full'
+                  )}
+                >
+                  View
+                </button>
+              )}
+            </Menu.Item>
+          </div>
+          <div className="py-1">
+            <Menu.Item>
+              {({ active }) => (
+                <button
+                  onClick={onBtnUpdate}
+                  className={classNames(
+                    active ? 'bg-gray-100 text-gray-900' : 'text-gray-700',
+                    'block px-4 py-2 text-sm text-left w-full'
+                  )}
+                >
+                  Update
+                </button>
+              )}
+            </Menu.Item>
+          </div>
+          <div className="py-1">
+            <Menu.Item>
+              {({ active }) => (
+                <button
+                  onClick={onBtnDelete}
+                  className={classNames(
+                    active ? 'bg-gray-100 text-gray-900' : 'text-gray-700',
+                    'block px-4 py-2 text-sm text-left w-full text-red-500'
+                  )}
+                >
+                  Delete
+                </button>
+              )}
+            </Menu.Item>
+          </div>
+        </Menu.Items>
+      </Transition>
+    </Menu>
+  )
+}
+
 
 export default function ProductsPage() {
   // get currency
@@ -194,6 +265,17 @@ export default function ProductsPage() {
     setShowAddModal(false)
   }
 
+  const btnDeleteProduct = async id => {
+    try {
+      const res = await window.api.removeProduct(id)
+      await _getAllProducts()
+      toast.success('Product Removed.')
+    } catch (error) {
+      console.error(error)
+      toast.error('Something went wrong while deleting!')
+    }
+  };
+
   return (
     <div className='py-6'>
       <div className="px-8 pb-2 flex flex-wrap items-center justify-end gap-4 border-b border-ipos-grey-100">
@@ -262,9 +344,13 @@ export default function ProductsPage() {
                   <td className="py-3">{barcode}</td>
                   <td className="py-3">{soldBy}</td>
                   <td className='py-3'>
-                    <button>
-                      <IconDotsVertical />
-                    </button>
+                    <ProductOptionsMenu 
+                      onBtnDelete={()=>{
+                        btnDeleteProduct(id);
+                      }} 
+                      onBtnUpdate={()=>{}} 
+                      onBtnView={()=>{}}  
+                    />
                   </td>
                 </tr>
               })
