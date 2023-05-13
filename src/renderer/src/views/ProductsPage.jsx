@@ -1,6 +1,85 @@
-import React from 'react'
+import React, {Fragment} from 'react'
 import Search from '../components/Search.jsx'
-import { IconDotsVertical, IconDownload, IconFileImport, IconPlus, IconQrcode } from '@tabler/icons-react'
+import { IconCategory2, IconDotsCircleHorizontal, IconDotsVertical, IconDownload, IconFileImport, IconPlus, IconQrcode } from '@tabler/icons-react'
+
+import { Menu, Transition } from '@headlessui/react'
+
+function classNames(...classes) {
+  return classes.filter(Boolean).join(' ')
+}
+
+function OptionsMenu({onBtnPrintQR, onBtnExport, onBtnImport}) {
+  return <Menu as="div" className="relative inline-block text-left">
+  <div>
+    <Menu.Button className="flex items-center gap-2 bg-ipos-grey-50 hover:bg-ipos-grey-100 transition text-ipos-grey px-4 py-3 rounded-2xl">
+      <IconDotsCircleHorizontal />
+      Options
+    </Menu.Button>
+  </div>
+
+  <Transition
+    as={Fragment}
+    enter="transition ease-out duration-100"
+    enterFrom="transform opacity-0 scale-95"
+    enterTo="transform opacity-100 scale-100"
+    leave="transition ease-in duration-75"
+    leaveFrom="transform opacity-100 scale-100"
+    leaveTo="transform opacity-0 scale-95"
+  >
+    <Menu.Items className="absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+      <div className="py-1">
+        <Menu.Item>
+          {({ active }) => (
+            <button
+            onClick={onBtnPrintQR}
+              className={classNames(
+                active ? 'bg-gray-100 text-gray-900' : 'text-gray-700',
+                'flex items-center gap-2 px-4 py-2 text-sm text-left w-full'
+              )}
+            >
+              <IconQrcode />
+              <p>Print QR</p>
+            </button>
+          )}
+        </Menu.Item>
+      </div>
+      <div className="py-1">
+        <Menu.Item>
+          {({ active }) => (
+            <button
+            onClick={onBtnImport}
+              className={classNames(
+                active ? 'bg-gray-100 text-gray-900' : 'text-gray-700',
+                'flex items-center gap-2 px-4 py-2 text-sm text-left w-full'
+              )}
+            >
+              <IconFileImport />
+              <p>Import</p>
+            </button>
+          )}
+        </Menu.Item>
+      </div>
+      <div className="py-1">
+        <Menu.Item>
+          {({ active }) => (
+            <button
+            onClick={onBtnExport}
+              className={classNames(
+                active ? 'bg-gray-100 text-gray-900' : 'text-gray-700',
+                'flex items-center gap-2 px-4 py-2 text-sm text-left w-full'
+              )}
+            >
+              <IconDownload />
+              <p>Export</p>
+            </button>
+          )}
+        </Menu.Item>
+      </div>
+    </Menu.Items>
+  </Transition>
+</Menu>;
+}
+
 
 export default function ProductsPage() {
   return (
@@ -12,19 +91,11 @@ export default function ProductsPage() {
         </button>
 
         <button className='flex items-center gap-2 bg-ipos-grey-50 hover:bg-ipos-grey-100 transition text-ipos-grey px-4 py-3 rounded-2xl'>
-          <IconQrcode />
-          Print QR
+          <IconCategory2 />
+          Categories
         </button>
 
-        <button className='flex items-center gap-2 bg-ipos-grey-50 hover:bg-ipos-grey-100 transition text-ipos-grey px-4 py-3 rounded-2xl'>
-          <IconFileImport />
-          Import
-        </button>
-
-        <button className='flex items-center gap-2 bg-ipos-grey-50 hover:bg-ipos-grey-100 transition text-ipos-grey px-4 py-3 rounded-2xl'>
-          <IconDownload />
-          Export
-        </button>
+        <OptionsMenu onBtnPrintQR={()=>{}} onBtnExport={()=>{}} onBtnImport={()=>{}} />
 
         <Search />
       </div>
