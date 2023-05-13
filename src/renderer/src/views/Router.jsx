@@ -5,6 +5,7 @@ import Dashboard from './Dashboard.jsx';
 import HomePage from './HomePage.jsx';
 import POSPage from './POSPage.jsx';
 import ProductsPage from "./ProductsPage.jsx";
+import CategoriesPage from './CategoriesPage.jsx';
 import CustomersPage from "./CustomersPage.jsx";
 import ExpensesPage from "./ExpensesPage.jsx";
 import DiscountPage from "./DiscountPage.jsx";
@@ -18,6 +19,7 @@ import SettingTaxesPage from "./settings_pages/Taxes.jsx";
 import SettingDiningOptionsPage from "./settings_pages/DiningOptions.jsx";
 
 
+
 export default function RouterPage() {
   return (
     <div>
@@ -28,6 +30,7 @@ export default function RouterPage() {
             <Route path='' element={<HomePage/>} />
             <Route path='pos' element={<POSPage />} />
             <Route path='products' element={<ProductsPage />} />
+            <Route path='categories' element={<CategoriesPage />} />
             <Route path='customers' element={<CustomersPage />} />
             <Route path='expenses' element={<ExpensesPage />} />
             <Route path='discount' element={<DiscountPage />} />

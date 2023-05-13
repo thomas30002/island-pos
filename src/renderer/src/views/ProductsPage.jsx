@@ -3,6 +3,7 @@ import Search from '../components/Search.jsx'
 import { IconCategory2, IconDotsCircleHorizontal, IconDotsVertical, IconDownload, IconFileImport, IconPlus, IconQrcode } from '@tabler/icons-react'
 
 import { Menu, Transition } from '@headlessui/react'
+import { useNavigate } from 'react-router-dom'
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(' ')
@@ -83,6 +84,8 @@ function OptionsMenu({onBtnPrintQR, onBtnExport, onBtnImport}) {
 
 export default function ProductsPage() {
 
+  const navigate = useNavigate();
+
 
   const onBtnPrintQR = async () => {
 
@@ -96,6 +99,10 @@ export default function ProductsPage() {
 
   };
 
+  const btnCategoriesTap = () => {
+    navigate('/categories');
+  };
+
   return (
     <div className='py-6'>
       <div className="px-8 pb-2 flex flex-wrap items-center justify-end gap-4 border-b border-ipos-grey-100">
@@ -104,7 +111,7 @@ export default function ProductsPage() {
           Add Product
         </button>
 
-        <button className='flex items-center gap-2 bg-ipos-grey-50 hover:bg-ipos-grey-100 transition text-ipos-grey px-4 py-3 rounded-2xl'>
+        <button onClick={btnCategoriesTap} className='flex items-center gap-2 bg-ipos-grey-50 hover:bg-ipos-grey-100 transition text-ipos-grey px-4 py-3 rounded-2xl'>
           <IconCategory2 />
           Categories
         </button>
