@@ -17,9 +17,6 @@ export const Product = sequelize.define('Product', {
     cost: {
         type: DataTypes.NUMBER,
     },
-    category: {
-        type: DataTypes.INTEGER
-    },
     sku: {
         type: DataTypes.STRING,
     },
@@ -32,6 +29,9 @@ export const Product = sequelize.define('Product', {
         defaultValue: 'each'
     },
     image: {
-        type: DataTypes.BLOB
+        type: DataTypes.TEXT
     }
 }, {timestamps: true})
+
+Category.hasMany(Product);
+Product.belongsTo(Category);

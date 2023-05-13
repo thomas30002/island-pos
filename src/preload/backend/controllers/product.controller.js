@@ -18,8 +18,11 @@ export async function getProduct(id) {
     return res;
 }
 
-export async function addProduct(name, price, cost, category, sku, barcode, soldby, image) {
-    
+export async function addProduct(name, price, cost, sku, barcode, soldby, image, categoryId) {
+    const res = await Product.create({
+        name, price, cost, sku, barcode, soldby, image, categoryId
+    });
+    return res;
 }
 
 export async function getCategories() {
