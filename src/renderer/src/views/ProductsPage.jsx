@@ -82,6 +82,20 @@ function OptionsMenu({onBtnPrintQR, onBtnExport, onBtnImport}) {
 
 
 export default function ProductsPage() {
+
+
+  const onBtnPrintQR = async () => {
+
+  };
+
+  const onBtnExport = async () => {
+
+  };
+
+  const onBtnImport = async () => {
+
+  };
+
   return (
     <div className='py-6'>
       <div className="px-8 pb-2 flex flex-wrap items-center justify-end gap-4 border-b border-ipos-grey-100">
@@ -95,7 +109,7 @@ export default function ProductsPage() {
           Categories
         </button>
 
-        <OptionsMenu onBtnPrintQR={()=>{}} onBtnExport={()=>{}} onBtnImport={()=>{}} />
+        <OptionsMenu onBtnPrintQR={onBtnPrintQR} onBtnExport={onBtnExport} onBtnImport={onBtnImport} />
 
         <Search />
       </div>
