@@ -18,9 +18,9 @@ export async function getProduct(id) {
     return res;
 }
 
-export async function addProduct(name, price, cost, sku, barcode, soldby, image, categoryId) {
+export async function addProduct(name, price, cost, sku, barcode, soldby, image, CategoryId) {
     const res = await Product.create({
-        name, price, cost, sku, barcode, soldby, image, categoryId
+        name, price, cost, sku, barcode, soldby, image, CategoryId
     });
     return res;
 }

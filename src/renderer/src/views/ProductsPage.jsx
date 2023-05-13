@@ -4,6 +4,7 @@ import { IconCategory2, IconDotsCircleHorizontal, IconDotsVertical, IconDownload
 
 import { Menu, Transition } from '@headlessui/react'
 import { useNavigate } from 'react-router-dom'
+import { CURRENCIES } from "../config/currencies.config.js";
 import { toast } from 'react-hot-toast'
 
 function classNames(...classes) {
@@ -84,8 +85,15 @@ function OptionsMenu({onBtnPrintQR, onBtnExport, onBtnImport}) {
 
 
 export default function ProductsPage() {
+  // get currency
+  const currencyCode = window.api.getCurrency();
+  const currencyFind =  CURRENCIES.find(c=>c.cc == currencyCode);
+  const currencySymbol = currencyFind !== undefined ? currencyFind.symbol : '';
+  // get currency
+
   const [showAddModal, setShowAddModal] = useState(false)
   const [categories, setCategories] = useState([])
+  const [products, setProducts] = useState([])
 
   const navigate = useNavigate();
 
@@ -115,7 +123,13 @@ export default function ProductsPage() {
   };
 
   const _getAllProducts = async () => {
-
+    try {
+      const res = await window.api.getProducts()
+      console.log(res)
+      setProducts(res)
+    } catch (error) {
+      console.log(error)
+    }
   };
 
   const onBtnPrintQR = async () => {
@@ -161,6 +175,11 @@ export default function ProductsPage() {
     if (!price) {
       toast.error('Please Provide Price!')
       return
+    }
+
+    if(!category) {
+      toast.error("Please select Category \nor Create New Category to add products!");
+      return;
     }
 
     try {
@@ -210,61 +229,46 @@ export default function ProductsPage() {
             </tr>
           </thead>
           <tbody>
-            <tr className='border-b border-b-ipos-grey-100'>
-              <td className='py-3 pl-4'>1</td>
-              <td className='py-3'>
-                <img src="" alt="product img" className='w-16 h-16 rounded-2xl object-cover' />
-              </td>
-              <td className='py-3'>Whey Biscuits 100gm</td>
-              <td className='py-3'>Rs. 5</td>
-              <td className="py-3">Rs. 4</td>
-              <td className="py-3">Grocery</td>
-              <td className="py-3">SK1234</td>
-              <td className="py-3">1234</td>
-              <td className="py-3">Each</td>
-              <td className='py-3'>
-                <button>
-                  <IconDotsVertical />
-                </button>
-              </td>
-            </tr>
-            <tr className='border-b border-b-ipos-grey-100'>
-            <td className='py-3 pl-4'>1</td>
-              <td className='py-3'>
-                <img src="" alt="product img" className='w-16 h-16 rounded-2xl object-cover' />
-              </td>
-              <td className='py-3'>Whey Biscuits 100gm</td>
-              <td className='py-3'>Rs. 5</td>
-              <td className="py-3">Rs. 4</td>
-              <td className="py-3">Grocery</td>
-              <td className="py-3">SK1234</td>
-              <td className="py-3">1234</td>
-              <td className="py-3">Each</td>
-              <td className='py-3'>
-                <button>
-                  <IconDotsVertical />
-                </button>
-              </td>
-            </tr>
-            <tr className='border-b border-b-ipos-grey-100'>
-            <td className='py-3 pl-4'>1</td>
-              <td className='py-3'>
-                <img src="" alt="product img" className='w-16 h-16 rounded-2xl object-cover' />
-              </td>
-              <td className='py-3'>Whey Biscuits 100gm</td>
-              <td className='py-3'>Rs. 5</td>
-              <td className="py-3">Rs. 4</td>
-              <td className="py-3">Grocery</td>
-              <td className="py-3">SK1234</td>
-              <td className="py-3">1234</td>
-              <td className="py-3">Each</td>
-              <td className='py-3'>
-                <button>
-                  <IconDotsVertical />
-                </button>
-              </td>
-            </tr>
-            
+
+            {
+              products.map((product, index)=>{
+                const id = product.dataValues.id;
+                const name = product.dataValues.name;
+                const price = product.dataValues.price;
+                const cost = product.dataValues.cost;
+                const category = product.Category?.dataValues?.name || "";
+                const sku = product.dataValues.sku;
+                const barcode = product.dataValues.barcode;
+                const soldBy = product.dataValues.soldBy;
+
+                const productImage = product.dataValues.image;
+
+                return <tr className='border-b border-b-ipos-grey-100' key={index}>
+                  <td className='py-3 pl-4'>{index+1}</td>
+                  <td className='py-3'>
+                    {
+                      productImage !== undefined && productImage !== null && productImage !== "" 
+                      ? <img src="" alt="product img" className='w-16 h-16 rounded-2xl object-cover' /> 
+                      : <div className='w-16 h-16 rounded-2xl flex items-center justify-center bg-gray-100 text-gray-400'>
+                        {name[0].toUpperCase()}.
+                      </div>
+                    }
+                  </td>
+                  <td className='py-3'>{name}</td>
+                  <td className='py-3'>{currencySymbol}{price}</td>
+                  <td className="py-3">{currencySymbol}{cost}</td>
+                  <td className="py-3">{category}</td>
+                  <td className="py-3">{sku}</td>
+                  <td className="py-3">{barcode}</td>
+                  <td className="py-3">{soldBy}</td>
+                  <td className='py-3'>
+                    <button>
+                      <IconDotsVertical />
+                    </button>
+                  </td>
+                </tr>
+              })
+            }
             
           </tbody>
         </table>
