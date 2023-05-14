@@ -35,9 +35,9 @@ export async function removeProduct(id) {
     return res;
 }
 
-export async function updateProduct(id, name, price, cost, sku, barcode, soldby, image, CategoryId) {
+export async function updateProduct(id, name, price, cost, sku, barcode, soldBy, image, CategoryId) {
     const res = Product.update({
-        name, price, cost, sku, barcode, soldby, image, CategoryId,
+        name, price, cost, sku, barcode, soldBy, image, CategoryId,
     }, {
         where: {
             id

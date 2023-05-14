@@ -164,6 +164,7 @@ export default function ProductsPage() {
   // get currency
 
   const [showAddModal, setShowAddModal] = useState(false)
+  const [showUpdateModal, setShowUpdateModal] = useState(false)
   const [categories, setCategories] = useState([])
   const [products, setProducts] = useState([])
   const [productImage, setProductImage] = useState('');
@@ -179,6 +180,7 @@ export default function ProductsPage() {
   const txtProductCategoryRef = useRef(null)
 
 
+  const txtUpdateProductIDRef = useRef(null)
   const txtUpdateProductTitleRef = useRef(null)
   const txtUpdateProductPriceRef = useRef(null)
   const txtUpdateProductCostRef = useRef(null)
@@ -323,6 +325,64 @@ export default function ProductsPage() {
     }
   };
 
+
+  // update product
+  const closeUpdateModal = () => {
+    setShowUpdateModal(false)
+  }
+
+  const btnUpdateModal = async () => {
+    const id = txtUpdateProductIDRef.current.value;
+    const name = txtUpdateProductTitleRef.current.value
+    const price = txtUpdateProductPriceRef.current.value
+    const cost = txtUpdateProductCostRef.current.value
+    const category = txtUpdateProductCategoryRef.current.value;
+    const sku = txtUpdateProductSKURef.current.value;
+    const barcode = txtUpdateProductBarcodeRef.current.value;
+    const soldBy = txtUpdateProductSoldByRef.current.value;
+
+    const image = productImage;
+
+    if (!name) {
+      toast.error('Please Provide Name!')
+      return
+    }
+
+    if (!price) {
+      toast.error('Please Provide Price!')
+      return
+    }
+
+    if(!category) {
+      toast.error("Please select Category \nor Create New Category to add products!");
+      return;
+    }
+
+    try {
+      const res = await window.api.updateProduct(id, name, parseFloat(price), parseFloat(cost), sku, barcode, soldBy, image, category);
+      await _getAllProducts()
+      toast.success('Product Saved.')
+    } catch (error) {
+      console.error(error)
+      toast.error('Something went wrong while saving details!')
+    }
+
+    setShowUpdateModal(false)
+  };
+  const btnUpdateProduct = (id, name, price, cost, categoryId, sku, barcode, soldBy, productImage) => {
+    txtUpdateProductIDRef.current.value = id
+    txtUpdateProductTitleRef.current.value = name
+    txtUpdateProductPriceRef.current.value = price
+    txtUpdateProductCostRef.current.value = cost
+    txtUpdateProductSKURef.current.value = sku
+    txtUpdateProductBarcodeRef.current.value = barcode
+    txtUpdateProductSoldByRef.current.value = soldBy
+    txtUpdateProductCategoryRef.current.value = categoryId
+    setProductImage(productImage);
+    setShowUpdateModal(true);
+  }
+  // update product 
+
   return (
     <div className='py-6'>
       <div className="px-8 pb-2 flex flex-wrap items-center justify-end gap-4 border-b border-ipos-grey-100">
@@ -366,6 +426,7 @@ export default function ProductsPage() {
                 const price = product.dataValues.price;
                 const cost = product.dataValues.cost;
                 const category = product.Category?.dataValues?.name || "";
+                const categoryId = product.Category?.dataValues?.id;
                 const sku = product.dataValues.sku;
                 const barcode = product.dataValues.barcode;
                 const soldBy = product.dataValues.soldBy;
@@ -395,8 +456,12 @@ export default function ProductsPage() {
                       onBtnDelete={()=>{
                         btnDeleteProduct(id);
                       }} 
-                      onBtnUpdate={()=>{}} 
-                      onBtnView={()=>{}}  
+                      onBtnUpdate={()=>{
+                        btnUpdateProduct(id, name, price, cost, categoryId, sku, barcode, soldBy, productImage);
+                      }} 
+                      onBtnView={()=>{
+                        btnUpdateProduct(id, name, price, cost, categoryId, sku, barcode, soldBy, productImage);
+                      }}  
                     />
                   </td>
                 </tr>
@@ -481,7 +546,7 @@ export default function ProductsPage() {
             type="text"
             id="name"
             name="name"
-            placeholder="Write Customer Name here..."
+            placeholder="Write Product Name here..."
             className="block w-full px-4 py-3 bg-ipos-grey-50 rounded-2xl mt-1 outline-ipos-blue"
           />
 
@@ -586,6 +651,186 @@ export default function ProductsPage() {
         </div>
       </div>
       {/* modal */}
+
+      {/* update modal */}
+      <div
+        className={
+          showUpdateModal
+            ? 'w-96 md:w-[600px] rounded-2xl bg-white shadow-2xl fixed top-0 left-2/4 -translate-x-1/4 overflow-y-scroll px-4 py-3 mt-20 mr-4'
+            : 'hidden'
+        }
+      >
+        <div className="flex items-center gap-3 mt-4">
+          <button
+            onClick={closeUpdateModal}
+            className="w-12 h-12 flex items-center justify-center rounded-2xl bg-ipos-grey-50 hover:bg-ipos-grey-100 text-ipos-grey"
+          >
+            <IconX />
+          </button>
+          <h3>Update Product</h3>
+        </div>
+
+        <div className="mt-6">
+
+          <div className=' w-full flex flex-col items-center justify-center mt-8'>
+            <div className='relative w-32 h-32 bg-ipos-grey-50 rounded-2xl flex items-center justify-center'>
+              
+              {
+                productImage !== undefined && productImage !== '' && productImage !== null ? 
+                  <img src={productImage} alt="logo" className='w-32 h-32 object-cover rounded-2xl' />
+                :
+                <IconPhoto className='text-ipos-grey' />
+              }
+
+              {
+                productImage !== undefined && productImage !== '' && productImage !== null ? 
+                <button onClick={btnRemoveProductImage} className='absolute -top-4 -right-4 w-8 h-8 rounded-full bg-red-50 hover:bg-red-100 transition text-red-600  items-center justify-center flex'>
+                <IconTrash />
+              </button>
+                :
+                <button onClick={btnEditProductImage} className="transition bg-white hover:bg-ipos-grey-100 shadow-lg rounded-full absolute -bottom-4 flex items-center justify-center w-8 h-8 ">
+                  <IconUpload />
+                </button>
+              }
+
+              
+            </div>
+            <p className='mt-4'>Product Image</p>
+          </div>
+
+          <input type="hidden" ref={txtUpdateProductIDRef} />
+
+          <label htmlFor="name" className="mt-4 block w-full">
+            Product Title
+          </label>
+          <input
+            ref={txtUpdateProductTitleRef}
+            type="text"
+            id="name"
+            name="name"
+            placeholder="Write Product Name here..."
+            className="block w-full px-4 py-3 bg-ipos-grey-50 rounded-2xl mt-1 outline-ipos-blue"
+          />
+
+          <div className="flex gap-4">
+            <div className='w-full'>
+              <label htmlFor="price" className="mt-4 block w-full">
+                Price
+              </label>
+              <input
+                ref={txtUpdateProductPriceRef}
+                type="number"
+                id="price"
+                name="price"
+                placeholder="Write Price here..."
+                min="0"
+                className="block w-full px-4 py-3 bg-ipos-grey-50 rounded-2xl mt-1 outline-ipos-blue"
+              />
+            </div>
+
+            <div className='w-full'>
+              <label htmlFor="cost" className="mt-4 block w-full">
+                Cost
+              </label>
+              <input
+                ref={txtUpdateProductCostRef}
+                type="number"
+                id="cost"
+                name="cost"
+                min="0"
+                placeholder="Write Cost here..."
+                className="block w-full px-4 py-3 bg-ipos-grey-50 rounded-2xl mt-1 outline-ipos-blue"
+              />
+            </div>
+          </div>
+
+          <div className="flex gap-4">
+            <div className='w-full'>
+              <label htmlFor="category" className="mt-4 block w-full">
+                Category
+              </label>
+              <select
+                ref={txtUpdateProductCategoryRef}
+                id="category"
+                name="category"
+                placeholder="Select Category here..."
+                className="block w-full px-4 py-3 bg-ipos-grey-50 rounded-2xl mt-1 outline-ipos-blue"
+              >
+                <option value="">Select Category</option>
+                {categories.map((category, index)=>{
+                  const id = category.dataValues.id;
+                  const name = category.dataValues.name;
+
+                  return <option value={id} key={index}>{name}</option>
+                })}
+              </select>
+            </div>
+
+            <div className='w-full'>
+              <label htmlFor="soldby" className="mt-4 block w-full">
+                Sold By
+              </label>
+              <select
+                ref={txtUpdateProductSoldByRef}
+                id="soldby"
+                name="soldby"
+                placeholder="Select Soldby here..."
+                className="block w-full px-4 py-3 bg-ipos-grey-50 rounded-2xl mt-1 outline-ipos-blue"
+              >
+                <option value="each">Each</option>
+                <option value="weight">Weight</option>
+              </select>
+            </div>
+          </div>
+
+          <div className="flex gap-4">
+            <div className='w-full'>
+              <label htmlFor="sku" className="mt-4 block w-full">
+                SKU
+              </label>
+              <input
+                ref={txtUpdateProductSKURef}
+                type="text"
+                id="sku"
+                name="sku"
+                placeholder="Write SKU here..."
+                className="block w-full px-4 py-3 bg-ipos-grey-50 rounded-2xl mt-1 outline-ipos-blue"
+              />
+            </div>
+
+            <div className='w-full'>
+              <label htmlFor="Barcode" className="mt-4 block w-full">
+                Barcode
+              </label>
+              <input
+                ref={txtUpdateProductBarcodeRef}
+                type="text"
+                id="Barcode"
+                name="Barcode"
+                placeholder="Write Barcode here..."
+                className="block w-full px-4 py-3 bg-ipos-grey-50 rounded-2xl mt-1 outline-ipos-blue"
+              />
+            </div>
+          </div>
+
+        </div>
+
+        <div className="mt-6">
+          <button
+            onClick={btnUpdateModal}
+            className="rounded-2xl px-4 py-3 bg-ipos-blue hover:bg-ipos-logo-color text-white"
+          >
+            Save
+          </button>
+          <button
+            onClick={closeUpdateModal}
+            className="rounded-2xl px-4 py-3 bg-ipos-grey-50 hover:bg-ipos-grey-100 text-ipos-grey ml-2"
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
+      {/* update modal */}
     </div>
   )
 }
