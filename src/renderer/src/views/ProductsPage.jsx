@@ -1,11 +1,12 @@
 import React, {Fragment, useEffect, useRef, useState} from 'react'
 import Search from '../components/Search.jsx'
-import { IconCategory2, IconDotsCircleHorizontal, IconDotsVertical, IconDownload, IconFileImport, IconPlus, IconQrcode, IconX } from '@tabler/icons-react'
+import { IconCategory2, IconDotsCircleHorizontal, IconDotsVertical, IconDownload, IconFileImport, IconPencil, IconPhoto, IconPlus, IconQrcode, IconTrash, IconUpload, IconX } from '@tabler/icons-react'
 
 import { Menu, Transition } from '@headlessui/react'
 import { useNavigate } from 'react-router-dom'
 import { CURRENCIES } from "../config/currencies.config.js";
 import { toast } from 'react-hot-toast'
+import { blobToBase64 } from '../utils/blobToBase64.js'
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(' ')
@@ -165,6 +166,7 @@ export default function ProductsPage() {
   const [showAddModal, setShowAddModal] = useState(false)
   const [categories, setCategories] = useState([])
   const [products, setProducts] = useState([])
+  const [productImage, setProductImage] = useState('');
 
   const navigate = useNavigate();
 
@@ -175,6 +177,15 @@ export default function ProductsPage() {
   const txtProductBarcodeRef = useRef(null)
   const txtProductSoldByRef = useRef(null)
   const txtProductCategoryRef = useRef(null)
+
+
+  const txtUpdateProductTitleRef = useRef(null)
+  const txtUpdateProductPriceRef = useRef(null)
+  const txtUpdateProductCostRef = useRef(null)
+  const txtUpdateProductSKURef = useRef(null)
+  const txtUpdateProductBarcodeRef = useRef(null)
+  const txtUpdateProductSoldByRef = useRef(null)
+  const txtUpdateProductCategoryRef = useRef(null)
 
   
 
@@ -227,6 +238,42 @@ export default function ProductsPage() {
     setShowAddModal(false)
   }
 
+  const btnEditProductImage = async () => {
+    const imageCompression = await import('browser-image-compression');
+    
+
+    const input = document.createElement("input");
+    input.setAttribute("type", "file");
+    input.setAttribute("accept", "image/*");
+    input.addEventListener("change", async (e)=>{
+      // handle file
+      const imageFile = e.target.files[0];
+
+      const options = {
+        maxSizeMB: 0.5,
+        maxWidthOrHeight: 256,
+        useWebWorker: true
+      };
+
+      try {
+        const compressedFile = await imageCompression.default(imageFile, options);
+        // const url = URL.createObjectURL(compressedFile);
+        const url = await blobToBase64(compressedFile);
+
+        setProductImage(url);
+      } catch (error) {
+        console.log(error);
+      }
+
+    });
+
+    input.click();
+  };
+
+  const btnRemoveProductImage = () => {
+    setProductImage(null);
+  };
+
   const btnSaveAddModal = async () => {
     const name = txtProductTitleRef.current.value
     const price = txtProductPriceRef.current.value
@@ -236,7 +283,7 @@ export default function ProductsPage() {
     const barcode = txtProductBarcodeRef.current.value;
     const soldBy = txtProductSoldByRef.current.value;
 
-    const image = "";
+    const image = productImage;
 
     if (!name) {
       toast.error('Please Provide Name!')
@@ -330,7 +377,7 @@ export default function ProductsPage() {
                   <td className='py-3'>
                     {
                       productImage !== undefined && productImage !== null && productImage !== "" 
-                      ? <img src="" alt="product img" className='w-16 h-16 rounded-2xl object-cover' /> 
+                      ? <img src={productImage} alt="product img" className='w-16 h-16 rounded-2xl object-cover' /> 
                       : <div className='w-16 h-16 rounded-2xl flex items-center justify-center bg-gray-100 text-gray-400'>
                         {name[0].toUpperCase()}.
                       </div>
@@ -398,7 +445,35 @@ export default function ProductsPage() {
         </div>
 
         <div className="mt-6">
-          <label htmlFor="name" className="block w-full">
+
+          <div className=' w-full flex flex-col items-center justify-center mt-8'>
+            <div className='relative w-32 h-32 bg-ipos-grey-50 rounded-2xl flex items-center justify-center'>
+              
+              {
+                productImage !== undefined && productImage !== '' && productImage !== null ? 
+                  <img src={productImage} alt="logo" className='w-32 h-32 object-cover rounded-2xl' />
+                :
+                <IconPhoto className='text-ipos-grey' />
+              }
+
+              {
+                productImage !== undefined && productImage !== '' && productImage !== null ? 
+                <button onClick={btnRemoveProductImage} className='absolute -top-4 -right-4 w-8 h-8 rounded-full bg-red-50 hover:bg-red-100 transition text-red-600  items-center justify-center flex'>
+                <IconTrash />
+              </button>
+                :
+                <button onClick={btnEditProductImage} className="transition bg-white hover:bg-ipos-grey-100 shadow-lg rounded-full absolute -bottom-4 flex items-center justify-center w-8 h-8 ">
+                  <IconUpload />
+                </button>
+              }
+
+              
+            </div>
+            <p className='mt-4'>Product Image</p>
+          </div>
+
+
+          <label htmlFor="name" className="mt-4 block w-full">
             Product Title
           </label>
           <input
