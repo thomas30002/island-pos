@@ -65,6 +65,17 @@ export default function POSPage() {
   }
 
 
+  // cart
+  const btnRemoveCartItem = index => {
+    const newCart = cart.filter((v,i)=> i !== index);
+    setState({
+      ...state,
+      cart: newCart,
+    })
+  }
+  // cart
+
+
   return (
     <div className="px-8 py-6 w-full flex gap-6">
       {/* all items */}
@@ -149,7 +160,9 @@ export default function POSPage() {
                     <button className="text-ipos-blue block">
                       <IconPencil />
                     </button>
-                    <button className="text-red-400">
+                    <button onClick={()=>{
+                      btnRemoveCartItem(index);
+                    }} className="text-red-400">
                       <IconTrash />
                     </button>
                   </td>
