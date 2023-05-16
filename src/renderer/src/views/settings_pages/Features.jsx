@@ -21,7 +21,6 @@ export default function Features() {
   const btnPOSTapSoundSwitch = (e) => {
     if(e.target.checked) {
       playTapSound();
-      
     }
     // 
     saveFeatures({
