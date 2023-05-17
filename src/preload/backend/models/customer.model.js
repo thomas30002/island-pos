@@ -15,10 +15,6 @@ export const Customer = sequelize.define('Customer', {
     },
     phone: {
         type: DataTypes.STRING,
-        validate: {
-            min: 6,
-            max: 15,
-        },
         allowNull: true,
     },
     address: {

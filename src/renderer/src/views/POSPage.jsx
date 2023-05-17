@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { IconClearAll, IconDiscount2, IconFilter, IconPencil, IconSearch, IconTrash } from "@tabler/icons-react";
+import { IconClearAll, IconDiscount2, IconFilter, IconPencil, IconSearch, IconTrash, IconUserSearch } from "@tabler/icons-react";
 
 import { toast } from 'react-hot-toast'
 import { CURRENCIES } from "../config/currencies.config.js";
 import { playTapSound } from "../utils/playTapSound.js";
+import { Autocomplete } from "@mui/material";
 
 export default function POSPage() {
 
@@ -18,10 +19,12 @@ export default function POSPage() {
     products: [],
     categories: [],
     customers: [],
+    customerList: [],
+    selectedCustomer: null,
     cart: []
   });
 
-  const { products, categories, customers, cart } = state;
+  const { products, categories, customers, selectedCustomer, customerList, cart } = state;
 
   // cart total
   const cartTotal = cart.reduce((pV, cV, index, arr)=>{
@@ -40,11 +43,25 @@ export default function POSPage() {
     const productsResponse = await window.api.getProducts()
     const customersResponse = await window.api.getCustomers()
 
+    const customersOptions = [];
+    customersOptions.push({id: "walk-in",label: "Walk In Customer"});
+
+    if(customersResponse) {
+      customersResponse.forEach((customer)=>{
+        customersOptions.push({
+          id: customer.dataValues.id,
+          label: `${customer.dataValues.name} (${customer.dataValues.phone})`
+        });
+      })
+    }
+
     setState({
       ...state,
       products: productsResponse,
       categories: categoriesResponse,
       customers: customersResponse,
+      customerList: customersOptions,
+      selectedCustomer: customersOptions[0]
     });
   };
 
@@ -80,6 +97,12 @@ export default function POSPage() {
       ...state,
       cart: newCart,
     })
+  }
+  const btnClearCart = () => {
+    setState({
+      ...state,
+      cart: []
+    });
   }
   // cart
 
@@ -142,13 +165,39 @@ export default function POSPage() {
           <div className="flex items-center justify-between">
             <h3 className="font-bold">Cart</h3>
 
-            <button className="text-red-400">
+            <button onClick={btnClearCart} className="text-red-400">
               <IconClearAll />
             </button>
           </div>
-          <select className="mt-4 w-full px-4 py-3 border rounded-2xl">
+          {/* <select className="mt-4 w-full px-4 py-3 border rounded-2xl">
               <option value="walk-in">Walk In Customer</option>
-          </select>
+          </select> */}
+          
+            <Autocomplete
+            className="mt-4 w-full border rounded-2xl"
+              sx={{
+                display: 'block',
+                '& input': {
+                  outline: "none",
+                  padding: "12px 16px",
+                  borderRadius: "16px",
+                  width: "100%",
+                  bgcolor: 'background.paper',
+                  color: (theme) =>
+                    theme.palette.getContrastText(theme.palette.background.paper),
+                },
+              }}
+              id="customer-autocomplete-input"
+              options={customerList}
+              value={selectedCustomer}
+              onChange={(e, newValue)=>setState({...state, selectedCustomer: newValue})}
+              renderInput={(params) => (
+                <div ref={params.InputProps.ref} className="flex items-center">
+                  <IconUserSearch className="ml-4" />
+                  <input type="text" {...params.inputProps} className="block" />
+                </div>
+              )}
+            />
         </div>
 
         {
