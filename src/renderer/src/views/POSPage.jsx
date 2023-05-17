@@ -81,6 +81,12 @@ export default function POSPage() {
       cart: newCart,
     })
   }
+  const btnClearCart = () => {
+    setState({
+      ...state,
+      cart: []
+    });
+  }
   // cart
 
 
@@ -142,7 +148,7 @@ export default function POSPage() {
           <div className="flex items-center justify-between">
             <h3 className="font-bold">Cart</h3>
 
-            <button className="text-red-400">
+            <button onClick={btnClearCart} className="text-red-400">
               <IconClearAll />
             </button>
           </div>
