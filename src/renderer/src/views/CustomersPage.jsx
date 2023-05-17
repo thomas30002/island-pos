@@ -140,7 +140,7 @@ export default function CustomersPage() {
     }
 
     try {
-      const res = await window.api.addCustomer(name, phone, email, address)
+      const res = await window.api.addCustomer(name, email, phone, address)
       await _getAllCustomers()
       toast.success('Customer added.')
     } catch (error) {
