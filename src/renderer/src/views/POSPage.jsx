@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { IconClearAll, IconDiscount2, IconFilter, IconPencil, IconSearch, IconTrash, IconUserSearch } from "@tabler/icons-react";
+import React, { useEffect, useRef, useState } from "react";
+import { IconClearAll, IconDiscount2, IconFilter, IconMinus, IconPencil, IconPlus, IconSearch, IconTrash, IconUserSearch, IconX } from "@tabler/icons-react";
 
 import { toast } from 'react-hot-toast'
 import { CURRENCIES } from "../config/currencies.config.js";
@@ -23,6 +23,11 @@ export default function POSPage() {
     selectedCustomer: null,
     cart: []
   });
+
+
+  const [showEditCartItemQuantity, setShowEditCartItemQuantity] = useState(false);
+  const txtEditCartItemIDRef = useRef(null);
+  const txtEditCartItemQuantityRef = useRef(null);
 
   const { products, categories, customers, selectedCustomer, customerList, cart } = state;
 
@@ -105,6 +110,60 @@ export default function POSPage() {
     });
   }
   // cart
+
+
+
+  // modal: cart item quantity edit
+  const btnShowEditCartQuantityModal = (itemId, itemQuantity) => {
+    txtEditCartItemIDRef.current.value = itemId;
+    txtEditCartItemQuantityRef.current.value = itemQuantity;
+    setShowEditCartItemQuantity(true);
+  }
+  const btnCloseEditCartQuantityModal = () => {
+    txtEditCartItemIDRef.current.value = null;
+    txtEditCartItemQuantityRef.current.value = null;
+    setShowEditCartItemQuantity(false);
+  }
+  const btnEditCartQuantityPlus = () => {
+    let currentQty = parseInt(txtEditCartItemQuantityRef.current.value) || 0;
+    currentQty += 1;
+    txtEditCartItemQuantityRef.current.value = currentQty;
+  };
+  const btnEditCartQuantityMinus = () => {
+    let currentQty = parseInt(txtEditCartItemQuantityRef.current.value) || 0;
+    if(currentQty != 0) {
+      currentQty -= 1;
+    }
+    txtEditCartItemQuantityRef.current.value = currentQty;
+  };
+  const btnEditCartQuantityModalSave = () => {
+    const itemId = txtEditCartItemIDRef.current.value
+    const qty = parseInt(txtEditCartItemQuantityRef.current.value) || 0;
+    
+    if(qty > 0) {
+      const itemIndex = cart.findIndex((v, i)=>v.id == itemId);
+
+      const newCart = cart;
+      newCart[itemIndex].quantity = qty;
+
+      setState({
+        ...state,
+        cart: newCart,
+      });
+
+      btnCloseEditCartQuantityModal();
+      return;
+    } else {
+      const newCart = cart.filter((v,i)=> v.id != itemId);
+      setState({
+        ...state,
+        cart: newCart,
+      });
+      btnCloseEditCartQuantityModal();
+      return;
+    }
+  };
+  // modal: cart item quantity edit
 
 
   return (
@@ -218,7 +277,9 @@ export default function POSPage() {
                   <td className="text-sm py-3 max-w-[120px] overflow-hidden text-ellipsis whitespace-nowrap">{cartItem.name}</td>
                   <td className="text-sm py-3 flex gap-2">
                     <button className="text-ipos-blue block">
-                      <IconPencil />
+                      <IconPencil onClick={()=>{
+                        btnShowEditCartQuantityModal(cartItem.id, cartItem.quantity);
+                      }} />
                     </button>
                     <button onClick={()=>{
                       btnRemoveCartItem(index);
@@ -263,6 +324,54 @@ export default function POSPage() {
         }
       </div>
       {/* cart */}
+
+
+
+      {/* edit cart item quantity */}
+      <div className={showEditCartItemQuantity ? "w-full h-screen flex justify-center items-center fixed top-0 left-0 right-0": "hidden"}>
+        <div className="bg-white rounded-2xl px-4 py-3 shadow-xl w-96">
+         
+            <h3 className="text-center">Edit Item Quantity</h3>
+
+          
+          <div className="mt-8">
+            <input type="hidden" ref={txtEditCartItemIDRef} />
+            <div className="flex items-center justify-center gap-4">
+              <button
+                onClick={btnEditCartQuantityMinus}
+                className="w-12 h-12 flex items-center justify-center rounded-full bg-ipos-grey-50 hover:bg-ipos-grey-100 text-ipos-grey"
+              >
+                <IconMinus />
+              </button>
+              <input ref={txtEditCartItemQuantityRef} type="number" min="0" className="h-12 w-16 rounded-2xl bg-ipos-grey-50 text-ipos-grey text-center outline-none" />
+              <button
+                onClick={btnEditCartQuantityPlus}
+                className="w-12 h-12 flex items-center justify-center rounded-full bg-ipos-grey-50 hover:bg-ipos-grey-100 text-ipos-grey"
+              >
+                <IconPlus />
+              </button>
+            </div>
+
+            <div className="mt-8 flex justify-center">
+              <button
+                onClick={btnEditCartQuantityModalSave}
+                className="rounded-2xl px-4 py-3 bg-ipos-blue hover:bg-ipos-logo-color text-white"
+              >
+                Save
+              </button>
+              <button
+                onClick={btnCloseEditCartQuantityModal}
+                className="rounded-2xl px-4 py-3 bg-ipos-grey-50 hover:bg-ipos-grey-100 text-ipos-grey ml-2"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+      {/* edit cart item quantity */}
+
     </div>
   );
 }
