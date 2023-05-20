@@ -10,6 +10,15 @@ export const getDiscounts = async () => {
     return res;
 }
 
+export const getDiscount = async (code) => {
+    const res = await Discount.findOne({
+        where: {
+            discountCode: code
+        }
+    });
+    return res;
+};
+
 export const removeDiscount = async (discountCode) => {
     const res = await Discount.destroy({
         where: {
