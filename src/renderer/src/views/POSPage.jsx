@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { IconClearAll, IconDiscount2, IconFilter, IconMinus, IconPencil, IconPlus, IconSearch, IconTrash, IconUserSearch, IconX } from "@tabler/icons-react";
+import { IconArrowBackUp, IconClearAll, IconDiscount2, IconFilter, IconMinus, IconPencil, IconPlus, IconSearch, IconTrash, IconUserSearch, IconX } from "@tabler/icons-react";
 
 import { toast } from 'react-hot-toast'
 import { CURRENCIES } from "../config/currencies.config.js";
@@ -19,6 +19,7 @@ export default function POSPage() {
   const [state, setState] = useState({
     products: [],
     categories: [],
+    category: '',
     customers: [],
     customerList: [],
     selectedCustomer: null,
@@ -29,10 +30,11 @@ export default function POSPage() {
 
   const [showEditCartItemQuantity, setShowEditCartItemQuantity] = useState(false);
   const [showApplyDiscountModal, setShowApplyDiscountModal] = useState(false);
+  const [showCategoryFilterModal, setShowCategoryFilterModal] = useState(false);
   const txtEditCartItemIDRef = useRef(null);
   const txtEditCartItemQuantityRef = useRef(null);
 
-  const { products, categories, customers, selectedCustomer, customerList, cart, discount } = state;
+  const { products, categories, category, customers, selectedCustomer, customerList, cart, discount } = state;
 
   // cart total
   const cartTotal = cart.reduce((pV, cV, index, arr)=>{
@@ -230,6 +232,29 @@ export default function POSPage() {
   // discount
 
 
+  // filter
+  const onSelectedCategoryChange = e => {
+    setState({
+      ...state,
+      category: e.target.value,
+    })
+  };
+  const clearCategoryFilter = () => {
+    setState({
+      ...state,
+      category: '',
+    });
+    closeCategoryFilterModal();
+  }
+  const openCategoryFilterModal = () => {
+    setShowCategoryFilterModal(true);
+  };
+  const closeCategoryFilterModal = () => {
+    setShowCategoryFilterModal(false);
+  }
+  // filter
+
+
   return (
     <div className="px-8 py-6 w-full flex gap-6">
       {/* all items */}
@@ -238,7 +263,7 @@ export default function POSPage() {
           <h3 className="font-bold">All Items</h3>
 
           <div className="flex items-center gap-4">
-            <button>
+            <button onClick={openCategoryFilterModal}>
               <IconFilter />
             </button>
             <button>
@@ -251,13 +276,20 @@ export default function POSPage() {
         <div className="grid grid-cols-3 xl:grid-cols-4 mt-4 w-full h-[95%] overflow-y-scroll gap-4">
           {
             products
+            .filter((product)=>{
+              const CategoryId = product.dataValues.CategoryId;
+              if(category == "") {
+                return true;
+              } else {
+                return CategoryId == category;
+              }
+            })
             .map((product, index)=>{
 
               const id = product.dataValues.id;
               const name = product.dataValues.name;
               const price = product.dataValues.price;
               const productImage = product.dataValues.image;
-
 
               return <button className="block w-full h-52" key={index} onClick={()=>{
                 btnPOSItemTap({id: id, name, price});
@@ -472,6 +504,56 @@ export default function POSPage() {
         </div>
       </div>
       {/* apply discount */}
+
+
+      {/* filter */}
+      <div className={showCategoryFilterModal ? "w-full h-screen flex justify-center items-center fixed top-0 left-0 right-0":"hidden"}>
+        <div className="bg-white rounded-2xl px-4 py-3 shadow-xl w-96">
+        <div className="flex items-center justify-between gap-3 mt-4">
+          <div className="flex items-center gap-3">
+            <button
+              onClick={closeCategoryFilterModal}
+              className="w-12 h-12 flex items-center justify-center rounded-2xl bg-ipos-grey-50 hover:bg-ipos-grey-100 text-ipos-grey"
+            >
+              <IconX />
+            </button>
+            <h3>Apply Filter</h3>
+          </div>
+
+          <button
+            onClick={clearCategoryFilter}
+            className="w-12 h-12 flex items-center justify-center rounded-2xl bg-ipos-grey-50 hover:bg-ipos-grey-100 text-ipos-grey"
+          >
+            <IconArrowBackUp />
+          </button>
+        </div>
+
+          <div className="mt-4">
+
+              <label htmlFor="categories" className="w-full block">Categories</label>
+              <select 
+                name="categories" id="categories" 
+                placeholder="Enter Discount Code here..." 
+                className="mt-1 w-full block px-4 py-3 rounded-2xl border outline-indigo-500" 
+                value={category}
+                onChange={onSelectedCategoryChange}
+              >
+                <option value="">Select Category</option>
+                {
+                  categories.map((category, index)=>{
+                    const id = category.dataValues.id;
+                    const name = category.dataValues.name;
+
+                    return <option key={index} value={id}>{name}</option>
+                  })
+                }
+              </select>
+
+          </div>
+
+        </div>
+      </div>
+      {/* filter */}
 
     </div>
   );
