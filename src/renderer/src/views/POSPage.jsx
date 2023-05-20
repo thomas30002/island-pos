@@ -5,6 +5,7 @@ import { toast } from 'react-hot-toast'
 import { CURRENCIES } from "../config/currencies.config.js";
 import { playTapSound } from "../utils/playTapSound.js";
 import { Autocomplete } from "@mui/material";
+import { DISCOUNT_TYPE } from "../config/discountType.config.js";
 
 export default function POSPage() {
 
@@ -21,15 +22,17 @@ export default function POSPage() {
     customers: [],
     customerList: [],
     selectedCustomer: null,
+    discount: 0,
     cart: []
   });
 
 
   const [showEditCartItemQuantity, setShowEditCartItemQuantity] = useState(false);
+  const [showApplyDiscountModal, setShowApplyDiscountModal] = useState(false);
   const txtEditCartItemIDRef = useRef(null);
   const txtEditCartItemQuantityRef = useRef(null);
 
-  const { products, categories, customers, selectedCustomer, customerList, cart } = state;
+  const { products, categories, customers, selectedCustomer, customerList, cart, discount } = state;
 
   // cart total
   const cartTotal = cart.reduce((pV, cV, index, arr)=>{
@@ -37,6 +40,7 @@ export default function POSPage() {
 
     return pV+itemTotal;
   }, 0);
+  const payableTotal = cartTotal - discount;
   // cart total
 
   useEffect(() => {
@@ -166,6 +170,66 @@ export default function POSPage() {
   // modal: cart item quantity edit
 
 
+
+  // discount
+  const handleApplyDiscountFormSubmit = async e => {
+    e.preventDefault();
+
+    const discountCode = e.target.discountCode.value;
+    
+    if(!discountCode) {
+      toast.error("Please provide Disocunt Code!");
+      return;
+    }
+
+    try {
+      const res = await window.api.getDiscount(discountCode);
+      console.log(res);
+
+      if(res === null) {
+        toast.error("Discount Code is Invalid!");
+        return;
+      } 
+
+      const discountValue = res.dataValues.discountValue;
+      const discountType = res.dataValues.discountType;
+
+      if(discountType == DISCOUNT_TYPE.FIXED) {
+        setState({
+          ...state,
+          discount: discountValue,
+        });
+        closeApplyDiscountModal();
+      } else if (discountType == DISCOUNT_TYPE.PERCENTAGE) {
+
+        const discountAmount = Math.round((cartTotal * discountValue) / 100);
+        setState({
+          ...state,
+          discount: discountAmount,
+        });
+        closeApplyDiscountModal();
+      }
+
+    } catch (error) {
+      console.log(error);
+      toast.error("Something went wrong!");
+    }
+  }
+  const openApplyDiscountModal = () => {
+    setShowApplyDiscountModal(true);
+  };
+  const closeApplyDiscountModal = () => {
+    setShowApplyDiscountModal(false);
+  };
+  const btnRemoveDiscount = () => {
+    setState({
+      ...state,
+      discount: 0,
+    })
+  };
+  // discount
+
+
   return (
     <div className="px-8 py-6 w-full flex gap-6">
       {/* all items */}
@@ -288,7 +352,7 @@ export default function POSPage() {
                     </button>
                   </td>
                   <td className="text-sm text-right py-3">{cartItem.quantity}</td>
-                  <td className="text-sm text-right py-3">{currencySymbol}{Math.round(cartItem.quantity*cartItem.price)}</td>
+                  <td className="text-sm text-right py-3">{currencySymbol}{(cartItem.quantity*cartItem.price).toFixed(2)}</td>
                 </tr>
               })}
             </tbody>
@@ -301,18 +365,23 @@ export default function POSPage() {
           cart.length !== 0 ? <div className="bg-white/80 backdrop-blur-sm py-3 sticky bottom-0 left-0 right-0 rounded-2xl px-4">
           <div className="flex items-center justify-between">
             <p>Net Total</p>
-            <p className="font-bold">{currencySymbol}{cartTotal}</p>
+            <p className="font-bold">{currencySymbol}{cartTotal.toFixed(2)}</p>
           </div>
-          <div className="mt-2 flex items-center justify-between">
-            <p>Discount</p>
-            <p className="font-bold text-red-400">-{currencySymbol}0</p>
-          </div>
+          {discount !== 0 ? <div className="mt-2 flex items-center justify-between">
+            <div className="flex gap-2">
+              <p>Discount</p>
+              <button className="text-red-400" onClick={btnRemoveDiscount}>
+                <IconTrash />
+              </button>
+            </div>
+            <p className="font-bold text-red-400">-{currencySymbol}{discount.toFixed(2)}</p>
+          </div>: <></>}
           <div className="mt-2 flex items-center justify-between">
             <p>Payable Total</p>
-            <p className="font-bold">{currencySymbol}{cartTotal}</p>
+            <p className="font-bold">{currencySymbol}{payableTotal.toFixed(2)}</p>
           </div>
           <div className="mt-4 flex flex-col gap-2">
-            <button className="px-4 py-3 rounded-2xl bg-ipos-grey-100 text-ipos-grey hover:bg-ipos-grey-50 flex justify-center gap-2">
+            <button onClick={openApplyDiscountModal} className="px-4 py-3 rounded-2xl bg-ipos-grey-100 text-ipos-grey hover:bg-ipos-grey-50 flex justify-center gap-2">
               <IconDiscount2 />
               Apply Discount
             </button>
@@ -371,6 +440,38 @@ export default function POSPage() {
         </div>
       </div>
       {/* edit cart item quantity */}
+
+
+      {/* apply discount */}
+      <div className={showApplyDiscountModal?"w-full h-screen flex justify-center items-center fixed top-0 left-0 right-0":"hidden"}>
+        <div className="bg-white rounded-2xl px-4 py-3 shadow-xl w-96">
+
+          <div className="mt-4">
+
+            <form onSubmit={handleApplyDiscountFormSubmit}>
+              <label htmlFor="discountCode" className="w-full block">Discount Code</label>
+              <input type="text" name="discountCode" placeholder="Enter Discount Code here..." className="mt-1 w-full block px-4 py-3 rounded-2xl border outline-indigo-500" />
+
+              <div className="mt-8 flex justify-center">
+                <button
+                  className="rounded-2xl px-4 py-3 bg-ipos-blue hover:bg-ipos-logo-color text-white"
+                  type="submit"
+                >
+                  Apply
+                </button>
+                <button
+                  onClick={closeApplyDiscountModal}
+                  className="rounded-2xl px-4 py-3 bg-ipos-grey-50 hover:bg-ipos-grey-100 text-ipos-grey ml-2"
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
+          </div>
+
+        </div>
+      </div>
+      {/* apply discount */}
 
     </div>
   );

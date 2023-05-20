@@ -5,7 +5,7 @@ import {addPaymentType,getPaymentTypes, removePaymentType} from "./backend/contr
 import {addTax,getTaxes, removeTax} from "./backend/controllers/taxes.controller"
 import {addDiningOption,getDiningOptions,removeDiningOption} from "./backend/controllers/diningOptions.controller"
 import {getReceiptSettings,saveReceiptSettings, getCurrency, setCurrency} from "./backend/controllers/receiptSetting.controller"
-import {addDiscount,getDiscounts,removeDiscount} from "./backend/controllers/discount.controller"
+import {addDiscount,getDiscounts,removeDiscount,getDiscount} from "./backend/controllers/discount.controller"
 import { addExpense, getExpenses, removeExpense, updateExpense } from './backend/controllers/expenses.controller'
 import { addCustomer,getCustomer, getCustomers, removeCustomer,updateCustomer } from "./backend/controllers/customer.controller"
 import { addCategory, getCategories, removeCategory, addProduct, getProduct, getProducts, removeProduct, updateProduct } from "./backend/controllers/product.controller"
@@ -41,6 +41,7 @@ const api = {
   // discount
   addDiscount,
   getDiscounts,
+  getDiscount,
   removeDiscount,
   // discount
 
