@@ -222,7 +222,10 @@ export default function POSPage() {
     setShowApplyDiscountModal(false);
   };
   const btnRemoveDiscount = () => {
-
+    setState({
+      ...state,
+      discount: 0,
+    })
   };
   // discount
 
@@ -349,7 +352,7 @@ export default function POSPage() {
                     </button>
                   </td>
                   <td className="text-sm text-right py-3">{cartItem.quantity}</td>
-                  <td className="text-sm text-right py-3">{currencySymbol}{Math.round(cartItem.quantity*cartItem.price)}</td>
+                  <td className="text-sm text-right py-3">{currencySymbol}{(cartItem.quantity*cartItem.price).toFixed(2)}</td>
                 </tr>
               })}
             </tbody>
@@ -362,7 +365,7 @@ export default function POSPage() {
           cart.length !== 0 ? <div className="bg-white/80 backdrop-blur-sm py-3 sticky bottom-0 left-0 right-0 rounded-2xl px-4">
           <div className="flex items-center justify-between">
             <p>Net Total</p>
-            <p className="font-bold">{currencySymbol}{cartTotal}</p>
+            <p className="font-bold">{currencySymbol}{cartTotal.toFixed(2)}</p>
           </div>
           {discount !== 0 ? <div className="mt-2 flex items-center justify-between">
             <div className="flex gap-2">
@@ -371,11 +374,11 @@ export default function POSPage() {
                 <IconTrash />
               </button>
             </div>
-            <p className="font-bold text-red-400">-{currencySymbol}{discount}</p>
+            <p className="font-bold text-red-400">-{currencySymbol}{discount.toFixed(2)}</p>
           </div>: <></>}
           <div className="mt-2 flex items-center justify-between">
             <p>Payable Total</p>
-            <p className="font-bold">{currencySymbol}{payableTotal}</p>
+            <p className="font-bold">{currencySymbol}{payableTotal.toFixed(2)}</p>
           </div>
           <div className="mt-4 flex flex-col gap-2">
             <button onClick={openApplyDiscountModal} className="px-4 py-3 rounded-2xl bg-ipos-grey-100 text-ipos-grey hover:bg-ipos-grey-50 flex justify-center gap-2">
