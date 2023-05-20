@@ -12,7 +12,7 @@ export default function Dashboard() {
       </div>
       {/* navbar */}
 
-      <div className='w-full'>
+      <div className='w-full h-screen overflow-y-scroll'>
         <Outlet/>
       </div>
     </div>
