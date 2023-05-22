@@ -37,5 +37,18 @@ export const Product = sequelize.define('Product', {
 Category.hasMany(Product);
 Product.belongsTo(Category);
 
+// Taxes.hasMany(Product, {
+//     foreignKey: {
+//       allowNull: true,
+//     }
+// });
+// Product.belongsTo(Taxes, {
+//     foreignKey: {
+//         allowNull: true
+//     }
+// })
+
+// Product.hasOne(Taxes);
+
 Taxes.hasMany(Product);
-Product.belongsTo(Taxes)
+Product.belongsTo(Taxes);

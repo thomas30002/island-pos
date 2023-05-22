@@ -1,10 +1,11 @@
 import { Product } from "../models/product.model.js"
 import { Category } from "../models/category.model.js"
+import { Taxes } from "../models/taxes.model.js";
 
 export async function getProducts() {
     const res = await Product.findAll({
         order: [['createdAt', 'DESC']],
-        include: Category
+        include: [Category, Taxes]
     });
     return res;
 }
@@ -14,14 +15,14 @@ export async function getProduct(id) {
         where: {
             id
         },
-        include: Category
+        include: [Category, Taxes]
     });
     return res;
 }
 
-export async function addProduct(name, price, cost, sku, barcode, soldBy, image, CategoryId) {
+export async function addProduct(name, price, cost, sku, barcode, soldBy, image, CategoryId, TaxId) {
     const res = await Product.create({
-        name, price, cost, sku, barcode, soldBy, image, CategoryId
+        name, price, cost, sku, barcode, soldBy, image, CategoryId, TaxId
     });
     return res;
 }
@@ -35,9 +36,9 @@ export async function removeProduct(id) {
     return res;
 }
 
-export async function updateProduct(id, name, price, cost, sku, barcode, soldBy, image, CategoryId) {
+export async function updateProduct(id, name, price, cost, sku, barcode, soldBy, image, CategoryId, TaxId) {
     const res = Product.update({
-        name, price, cost, sku, barcode, soldBy, image, CategoryId,
+        name, price, cost, sku, barcode, soldBy, image, CategoryId, TaxId
     }, {
         where: {
             id
