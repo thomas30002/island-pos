@@ -1,13 +1,14 @@
 import { IconPlus, IconTrash, IconX } from '@tabler/icons-react'
 import React, { useEffect, useRef, useState } from 'react'
 import { toast } from 'react-hot-toast';
-
+import { TAX_TYPES } from "../../config/taxType.config";
 
 export default function Taxes() {
   const [showAddModal, setShowAddModal] = useState(false);
   
   const txtTaxNameRef = useRef(null);
   const txtTaxRateRef = useRef(null);
+  const txtTaxTypeRef = useRef(null);
 
   const [taxes, setTaxes] = useState([]);
 
@@ -35,6 +36,7 @@ export default function Taxes() {
   const btnSaveAddModal = async () => {
     const taxName = txtTaxNameRef.current.value;
     const taxRate = txtTaxRateRef.current.value;
+    const taxType = txtTaxTypeRef.current.value;
 
     if(!taxName) {
       toast.error("Please Provide Tax Name!");
@@ -45,9 +47,14 @@ export default function Taxes() {
       toast.error("Please Provide Tax Rate!");
       return;
     }
+
+    if(!taxType) {
+      toast.error("Please Provide Tax Type!");
+      return;
+    }
     
     try {
-      const res = await window.api.addTax(taxName,taxRate);
+      const res = await window.api.addTax(taxName,taxRate,taxType);
       await _getAllTaxes();
       toast.success("Tax added.")
     } catch (error) {
@@ -85,8 +92,9 @@ export default function Taxes() {
           <thead>
             <tr className='border-b'>
               <th className='text-left pb-2'>Name</th>
-              <th className='text-right pb-2'>Tax Rate</th>
-              <th className='text-right pb-2'>Action</th>
+              <th className='text-left pb-2'>Tax Type</th>
+              <th className='text-left pb-2'>Tax Rate</th>
+              <th className='text-left pb-2'>Action</th>
             </tr>
           </thead>
           <tbody>
@@ -94,12 +102,14 @@ export default function Taxes() {
 
               const name = tax.dataValues.name;
               const taxRate = tax.dataValues.taxRate;
+              const type = tax.dataValues.type;
               const id = tax.dataValues.id;
 
               return <tr className="border-b" key={index}>
                 <td className='py-2'>{name}</td>
-                <td className='text-right py-2'>{taxRate}%</td>
-                <td className='text-right py-2'>
+                <td className='py-2'>{type}</td>
+                <td className='text-left py-2'>{taxRate}%</td>
+                <td className='text-left py-2'>
                   <button onClick={()=>{
                     btnDeleteTax(id);
                   }} className='text-red-500 hover:text-red-400'>
@@ -108,24 +118,7 @@ export default function Taxes() {
                 </td>
               </tr>
             })}
-            {/* <tr className='border-b'>
-              <td className=' py-2'>GST 5%</td>
-              <td className='text-right py-2'>5%</td>
-              <td className='text-right py-2'>
-                <button className='text-red-500 hover:text-red-400'>
-                  <IconTrash />
-                </button>
-              </td>
-            </tr>
-            <tr>
-              <td className=' py-2'>GST 15%</td>
-              <td className='text-right py-2'>15%</td>
-              <td className='text-right py-2'>
-                <button className='text-red-500 hover:text-red-400'>
-                  <IconTrash />
-                </button>
-              </td>
-            </tr> */}
+            
           </tbody>
         </table>
       </div>
@@ -146,6 +139,12 @@ export default function Taxes() {
 
           <label htmlFor="taxRate" className='mt-4 block w-full'>Tax Rate</label>
           <input ref={txtTaxRateRef} type="number" min="0" max="1000" id='taxRate' name='taxRate' placeholder='Write Tax Rate here...' className='block w-full px-4 py-3 bg-ipos-grey-50 rounded-2xl mt-1 outline-ipos-blue' />
+
+          <label htmlFor="type" className='block mt-4 w-full'>Tax Type</label>
+          <select name="type" id="type" ref={txtTaxTypeRef} className='block w-full px-4 py-3 bg-ipos-grey-50 rounded-2xl mt-1 outline-ipos-blue'>
+            <option value={TAX_TYPES.INCLUSIVE}>Inclusive of Price</option>
+            <option value={TAX_TYPES.EXCLUSIVE}>Exclusive of Price</option>
+          </select>
         </div>
 
         <div className="absolute bottom-4">

@@ -14,5 +14,10 @@ export const Taxes = sequelize.define('Taxes', {
     taxRate: {
         type: DataTypes.NUMBER,
         allowNull: false
+    },
+    type: {
+        type: DataTypes.ENUM,
+        values: ['INCLUSIVE', 'EXCLUSIVE'],
+        allowNull: false,
     }
 }, {freezeTableName: true})
