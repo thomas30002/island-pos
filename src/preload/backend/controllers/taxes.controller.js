@@ -1,7 +1,7 @@
 import {Taxes} from "../models/taxes.model.js"
 
-export const addTax = async (taxName, taxRate) => {
-    const res = await Taxes.create({name: taxName, taxRate: taxRate});
+export const addTax = async (taxName, taxRate, type) => {
+    const res = await Taxes.create({name: taxName, taxRate: taxRate, type: type});
     return res;
 };
 

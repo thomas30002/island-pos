@@ -166,6 +166,7 @@ export default function ProductsPage() {
   const [showAddModal, setShowAddModal] = useState(false)
   const [showUpdateModal, setShowUpdateModal] = useState(false)
   const [categories, setCategories] = useState([])
+  const [taxes, setTaxes] = useState([])
   const [products, setProducts] = useState([])
   const [productImage, setProductImage] = useState('');
 
@@ -178,6 +179,7 @@ export default function ProductsPage() {
   const txtProductBarcodeRef = useRef(null)
   const txtProductSoldByRef = useRef(null)
   const txtProductCategoryRef = useRef(null)
+  const txtProductTaxRef = useRef(null)
 
 
   const txtUpdateProductIDRef = useRef(null)
@@ -188,12 +190,14 @@ export default function ProductsPage() {
   const txtUpdateProductBarcodeRef = useRef(null)
   const txtUpdateProductSoldByRef = useRef(null)
   const txtUpdateProductCategoryRef = useRef(null)
+  const txtUpdateProductTaxRef = useRef(null)
 
   
 
   useEffect(() => {
     _getAllCategories()
     _getAllProducts();
+    _getAllTaxes();
   }, [])
 
   const _getAllCategories = async () => {
@@ -201,6 +205,16 @@ export default function ProductsPage() {
       const res = await window.api.getCategories()
       console.log(res)
       setCategories(res)
+    } catch (error) {
+      console.log(error)
+    }
+  };
+
+  const _getAllTaxes = async () => {
+    try {
+      const res = await window.api.getTaxes()
+      console.log(res)
+      setTaxes(res)
     } catch (error) {
       console.log(error)
     }
@@ -284,6 +298,7 @@ export default function ProductsPage() {
     const sku = txtProductSKURef.current.value;
     const barcode = txtProductBarcodeRef.current.value;
     const soldBy = txtProductSoldByRef.current.value;
+    const tax = txtProductTaxRef.current.value || null;
 
     const image = productImage;
 
@@ -303,7 +318,7 @@ export default function ProductsPage() {
     }
 
     try {
-      const res = await window.api.addProduct(name, parseFloat(price), parseFloat(cost), sku, barcode, soldBy, image, category);
+      const res = await window.api.addProduct(name, parseFloat(price), parseFloat(cost), sku, barcode, soldBy, image, category, tax);
       await _getAllProducts()
       toast.success('Product added.')
     } catch (error) {
@@ -340,6 +355,7 @@ export default function ProductsPage() {
     const sku = txtUpdateProductSKURef.current.value;
     const barcode = txtUpdateProductBarcodeRef.current.value;
     const soldBy = txtUpdateProductSoldByRef.current.value;
+    const tax = txtUpdateProductTaxRef.current.value || null;
 
     const image = productImage;
 
@@ -359,7 +375,7 @@ export default function ProductsPage() {
     }
 
     try {
-      const res = await window.api.updateProduct(id, name, parseFloat(price), parseFloat(cost), sku, barcode, soldBy, image, category);
+      const res = await window.api.updateProduct(id, name, parseFloat(price), parseFloat(cost), sku, barcode, soldBy, image, category, tax);
       await _getAllProducts()
       toast.success('Product Saved.')
     } catch (error) {
@@ -369,7 +385,8 @@ export default function ProductsPage() {
 
     setShowUpdateModal(false)
   };
-  const btnUpdateProduct = (id, name, price, cost, categoryId, sku, barcode, soldBy, productImage) => {
+
+  const btnUpdateProduct = (id, name, price, cost, categoryId, sku, barcode, soldBy, productImage, taxId) => {
     txtUpdateProductIDRef.current.value = id
     txtUpdateProductTitleRef.current.value = name
     txtUpdateProductPriceRef.current.value = price
@@ -378,6 +395,7 @@ export default function ProductsPage() {
     txtUpdateProductBarcodeRef.current.value = barcode
     txtUpdateProductSoldByRef.current.value = soldBy
     txtUpdateProductCategoryRef.current.value = categoryId
+    txtUpdateProductTaxRef.current.value = taxId
     setProductImage(productImage);
     setShowUpdateModal(true);
   }
@@ -427,6 +445,7 @@ export default function ProductsPage() {
                 const cost = product.dataValues.cost;
                 const category = product.Category?.dataValues?.name || "";
                 const categoryId = product.Category?.dataValues?.id;
+                const taxId = product.Tax?.dataValues?.id;
                 const sku = product.dataValues.sku;
                 const barcode = product.dataValues.barcode;
                 const soldBy = product.dataValues.soldBy;
@@ -457,10 +476,10 @@ export default function ProductsPage() {
                         btnDeleteProduct(id);
                       }} 
                       onBtnUpdate={()=>{
-                        btnUpdateProduct(id, name, price, cost, categoryId, sku, barcode, soldBy, productImage);
+                        btnUpdateProduct(id, name, price, cost, categoryId, sku, barcode, soldBy, productImage, taxId);
                       }} 
                       onBtnView={()=>{
-                        btnUpdateProduct(id, name, price, cost, categoryId, sku, barcode, soldBy, productImage);
+                        btnUpdateProduct(id, name, price, cost, categoryId, sku, barcode, soldBy, productImage, taxId);
                       }}  
                     />
                   </td>
@@ -595,6 +614,27 @@ export default function ProductsPage() {
             })}
           </select>
 
+          <label htmlFor="tax" className="mt-4 block w-full">
+            Tax
+          </label>
+          <select
+            ref={txtProductTaxRef}
+            id="tax"
+            name="tax"
+            placeholder="Select Tax here..."
+            className="block w-full px-4 py-3 bg-ipos-grey-50 rounded-2xl mt-1 outline-ipos-blue"
+          >
+            <option value="">Select Tax</option>
+            {taxes.map((tax, index)=>{
+              const id = tax.dataValues.id;
+              const name = tax.dataValues.name;
+              const type = tax.dataValues.type;
+              const taxRate = tax.dataValues.taxRate;
+
+              return <option value={id} key={index}>{name} - {type} ({taxRate}%)</option>
+            })}
+          </select>
+
           <label htmlFor="sku" className="mt-4 block w-full">
             SKU
           </label>
@@ -672,79 +712,83 @@ export default function ProductsPage() {
 
         <div className="mt-6">
 
-          <div className=' w-full flex flex-col items-center justify-center mt-8'>
-            <div className='relative w-32 h-32 bg-ipos-grey-50 rounded-2xl flex items-center justify-center'>
-              
-              {
-                productImage !== undefined && productImage !== '' && productImage !== null ? 
-                  <img src={productImage} alt="logo" className='w-32 h-32 object-cover rounded-2xl' />
-                :
-                <IconPhoto className='text-ipos-grey' />
-              }
+          <div className="flex gap-6 w-full mt-8">
+            <div className='w-full flex flex-col items-center justify-center '>
+              <div className='relative w-32 h-32 bg-ipos-grey-50 rounded-2xl flex items-center justify-center'>
+                
+                {
+                  productImage !== undefined && productImage !== '' && productImage !== null ? 
+                    <img src={productImage} alt="logo" className='w-32 h-32 object-cover rounded-2xl' />
+                  :
+                  <IconPhoto className='text-ipos-grey' />
+                }
 
-              {
-                productImage !== undefined && productImage !== '' && productImage !== null ? 
-                <button onClick={btnRemoveProductImage} className='absolute -top-4 -right-4 w-8 h-8 rounded-full bg-red-50 hover:bg-red-100 transition text-red-600  items-center justify-center flex'>
-                <IconTrash />
-              </button>
-                :
-                <button onClick={btnEditProductImage} className="transition bg-white hover:bg-ipos-grey-100 shadow-lg rounded-full absolute -bottom-4 flex items-center justify-center w-8 h-8 ">
-                  <IconUpload />
+                {
+                  productImage !== undefined && productImage !== '' && productImage !== null ? 
+                  <button onClick={btnRemoveProductImage} className='absolute -top-4 -right-4 w-8 h-8 rounded-full bg-red-50 hover:bg-red-100 transition text-red-600  items-center justify-center flex'>
+                  <IconTrash />
                 </button>
-              }
+                  :
+                  <button onClick={btnEditProductImage} className="transition bg-white hover:bg-ipos-grey-100 shadow-lg rounded-full absolute -bottom-4 flex items-center justify-center w-8 h-8 ">
+                    <IconUpload />
+                  </button>
+                }
 
-              
+                
+              </div>
+              <p className='mt-4'>Product Image</p>
             </div>
-            <p className='mt-4'>Product Image</p>
+
+            <div className=' flex-shrink-0'>
+              <label htmlFor="name" className="block w-full">
+                Product Title
+              </label>
+              <input
+                ref={txtUpdateProductTitleRef}
+                type="text"
+                id="name"
+                name="name"
+                placeholder="Write Product Name here..."
+                className="block w-full px-4 py-3 bg-ipos-grey-50 rounded-2xl mt-1 outline-ipos-blue"
+              />
+              <div className="flex gap-4">
+                <div className='w-full'>
+                  <label htmlFor="price" className="mt-4 block w-full">
+                    Price
+                  </label>
+                  <input
+                    ref={txtUpdateProductPriceRef}
+                    type="number"
+                    id="price"
+                    name="price"
+                    placeholder="Write Price here..."
+                    min="0"
+                    className="block w-full px-4 py-3 bg-ipos-grey-50 rounded-2xl mt-1 outline-ipos-blue"
+                  />
+                </div>
+
+                <div className='w-full'>
+                  <label htmlFor="cost" className="mt-4 block w-full">
+                    Cost
+                  </label>
+                  <input
+                    ref={txtUpdateProductCostRef}
+                    type="number"
+                    id="cost"
+                    name="cost"
+                    min="0"
+                    placeholder="Write Cost here..."
+                    className="block w-full px-4 py-3 bg-ipos-grey-50 rounded-2xl mt-1 outline-ipos-blue"
+                  />
+                </div>
+              </div>
+            </div>
+            
           </div>
 
           <input type="hidden" ref={txtUpdateProductIDRef} />
 
-          <label htmlFor="name" className="mt-4 block w-full">
-            Product Title
-          </label>
-          <input
-            ref={txtUpdateProductTitleRef}
-            type="text"
-            id="name"
-            name="name"
-            placeholder="Write Product Name here..."
-            className="block w-full px-4 py-3 bg-ipos-grey-50 rounded-2xl mt-1 outline-ipos-blue"
-          />
-
-          <div className="flex gap-4">
-            <div className='w-full'>
-              <label htmlFor="price" className="mt-4 block w-full">
-                Price
-              </label>
-              <input
-                ref={txtUpdateProductPriceRef}
-                type="number"
-                id="price"
-                name="price"
-                placeholder="Write Price here..."
-                min="0"
-                className="block w-full px-4 py-3 bg-ipos-grey-50 rounded-2xl mt-1 outline-ipos-blue"
-              />
-            </div>
-
-            <div className='w-full'>
-              <label htmlFor="cost" className="mt-4 block w-full">
-                Cost
-              </label>
-              <input
-                ref={txtUpdateProductCostRef}
-                type="number"
-                id="cost"
-                name="cost"
-                min="0"
-                placeholder="Write Cost here..."
-                className="block w-full px-4 py-3 bg-ipos-grey-50 rounded-2xl mt-1 outline-ipos-blue"
-              />
-            </div>
-          </div>
-
-          <div className="flex gap-4">
+          <div className="flex gap-4 mt-4">
             <div className='w-full'>
               <label htmlFor="category" className="mt-4 block w-full">
                 Category
@@ -781,6 +825,29 @@ export default function ProductsPage() {
                 <option value="weight">Weight</option>
               </select>
             </div>
+          </div>
+
+          <div className="w-full">
+            <label htmlFor="tax" className="mt-4 block w-full">
+              Tax
+            </label>
+            <select
+              ref={txtUpdateProductTaxRef}
+              id="tax"
+              name="tax"
+              placeholder="Select Tax here..."
+              className="block w-full px-4 py-3 bg-ipos-grey-50 rounded-2xl mt-1 outline-ipos-blue"
+            >
+              <option value="">Select Tax</option>
+              {taxes.map((tax, index)=>{
+                const id = tax.dataValues.id;
+                const name = tax.dataValues.name;
+                const type = tax.dataValues.type;
+                const taxRate = tax.dataValues.taxRate;
+
+                return <option value={id} key={index}>{name} - {type} ({taxRate}%)</option>
+              })}
+            </select>
           </div>
 
           <div className="flex gap-4">
