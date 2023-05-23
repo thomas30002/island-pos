@@ -7,6 +7,7 @@ import { useNavigate } from 'react-router-dom'
 import { CURRENCIES } from "../config/currencies.config.js";
 import { toast } from 'react-hot-toast'
 import { blobToBase64 } from '../utils/blobToBase64.js'
+import { calculatePriceAfterTax, calculateTax } from '../utils/calculateTax.js'
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(' ')
@@ -452,6 +453,14 @@ export default function ProductsPage() {
 
                 const productImage = product.dataValues.image;
 
+                // price + tax
+                const taxRate = product?.Tax?.dataValues?.taxRate || 0;
+                const taxType = product?.Tax?.dataValues?.type || null;
+
+                const calculatedTax = calculateTax(price, taxRate, taxType);
+                const priceAfterTax = calculatePriceAfterTax(price, taxRate, taxType);
+                // price + tax
+
                 return <tr className='border-b border-b-ipos-grey-100' key={index}>
                   <td className='py-3 pl-4'>{index+1}</td>
                   <td className='py-3'>
@@ -464,7 +473,7 @@ export default function ProductsPage() {
                     }
                   </td>
                   <td className='py-3'>{name}</td>
-                  <td className='py-3'>{currencySymbol}{price}</td>
+                  <td className='py-3'>{currencySymbol}{priceAfterTax}</td>
                   <td className="py-3">{currencySymbol}{cost}</td>
                   <td className="py-3">{category}</td>
                   <td className="py-3">{sku}</td>

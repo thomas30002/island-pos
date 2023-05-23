@@ -6,6 +6,8 @@ import { CURRENCIES } from "../config/currencies.config.js";
 import { playTapSound } from "../utils/playTapSound.js";
 import { Autocomplete } from "@mui/material";
 import { DISCOUNT_TYPE } from "../config/discountType.config.js";
+import { calculatePriceAfterTax, calculateTax } from "../utils/calculateTax.js";
+import { TAX_TYPES } from "../config/taxType.config.js";
 
 export default function POSPage() {
 
@@ -37,12 +39,39 @@ export default function POSPage() {
   const { products, categories, category, customers, selectedCustomer, customerList, cart, discount } = state;
 
   // cart total
-  const cartTotal = cart.reduce((pV, cV, index, arr)=>{
-    const itemTotal = cV.price * cV.quantity;
+  
+  // const cartTotal = cart.reduce((pV, cV, index, arr)=>{
+  //   const itemTotal = (cV.price * cV.quantity);
+
+  //   return pV+itemTotal;
+  // }, 0);
+
+  // const taxTotal = cart.reduce((pV, cV, index, arr)=>{
+  //   return pV+(cV.tax * cV.quantity);
+  // }, 0);
+
+  // const payableTotal = cartTotal + taxTotal - discount;
+
+  const netTotal = cart.reduce((pV, cV, index, arr)=>{
+    let itemTotal = 0;
+
+    if(cV.taxType == TAX_TYPES.EXCLUSIVE) {
+      itemTotal = (cV.price * cV.quantity);
+    } else if (cV.taxType == TAX_TYPES.INCLUSIVE) {
+      itemTotal = (cV.price - cV.tax) * cV.quantity;
+    } else {
+      itemTotal = (cV.price * cV.quantity);
+    }
 
     return pV+itemTotal;
   }, 0);
-  const payableTotal = cartTotal - discount;
+
+  const taxTotal = cart.reduce((pV, cV, index, arr)=>{
+    return pV+(cV.tax * cV.quantity);
+  }, 0);
+
+  const payableTotal = netTotal + taxTotal - discount;
+
   // cart total
 
   useEffect(() => {
@@ -77,14 +106,14 @@ export default function POSPage() {
   };
 
 
-  const btnPOSItemTap = async ({id, name, price}) => {
+  const btnPOSItemTap = async ({id, name, price, tax, priceAfterTax, taxType}) => {
     playTapSound();
 
     const existingItemIndex = cart.findIndex(cartItem => cartItem.id === id);
     const newCart = cart;
     if(existingItemIndex === -1) {
       // item not found
-      newCart.push({id, name, price, quantity: 1});
+      newCart.push({id, name, price, quantity: 1, tax, priceAfterTax, taxType});
       setState({
         ...state,
         cart: newCart,
@@ -204,7 +233,7 @@ export default function POSPage() {
         closeApplyDiscountModal();
       } else if (discountType == DISCOUNT_TYPE.PERCENTAGE) {
 
-        const discountAmount = Math.round((cartTotal * discountValue) / 100);
+        const discountAmount = Math.round((netTotal * discountValue) / 100);
         setState({
           ...state,
           discount: discountAmount,
@@ -220,7 +249,8 @@ export default function POSPage() {
   const openApplyDiscountModal = () => {
     setShowApplyDiscountModal(true);
   };
-  const closeApplyDiscountModal = () => {
+  const closeApplyDiscountModal = (e) => {
+    // e.preventDefault();
     setShowApplyDiscountModal(false);
   };
   const btnRemoveDiscount = () => {
@@ -291,8 +321,16 @@ export default function POSPage() {
               const price = product.dataValues.price;
               const productImage = product.dataValues.image;
 
+              // price + tax
+              const taxRate = product?.Tax?.dataValues?.taxRate || 0;
+              const taxType = product?.Tax?.dataValues?.type || null;
+
+              const calculatedTax = calculateTax(price, taxRate, taxType);
+              const priceAfterTax = calculatePriceAfterTax(price, taxRate, taxType);
+              // price + tax
+
               return <button className="block w-full h-52" key={index} onClick={()=>{
-                btnPOSItemTap({id: id, name, price});
+                btnPOSItemTap({id: id, name, price:price, tax: calculatedTax, priceAfterTax: priceAfterTax, taxType});
               }}>
                 <div className="w-full h-44 rounded-2xl border">
                   {
@@ -304,7 +342,7 @@ export default function POSPage() {
                   }
                 </div>
                 <p className="mt-1 text-sm overflow-hidden text-ellipsis whitespace-nowrap max-w-full">{name}</p>
-                <p className="text-sm">{currencySymbol}{price}</p>
+                <p className="text-sm">{currencySymbol}{priceAfterTax}</p>
               </button>;
             }
             )
@@ -384,7 +422,7 @@ export default function POSPage() {
                     </button>
                   </td>
                   <td className="text-sm text-right py-3">{cartItem.quantity}</td>
-                  <td className="text-sm text-right py-3">{currencySymbol}{(cartItem.quantity*cartItem.price).toFixed(2)}</td>
+                  <td className="text-sm text-right py-3">{currencySymbol}{(cartItem.quantity*cartItem.priceAfterTax).toFixed(2)}</td>
                 </tr>
               })}
             </tbody>
@@ -397,8 +435,14 @@ export default function POSPage() {
           cart.length !== 0 ? <div className="bg-white/80 backdrop-blur-sm py-3 sticky bottom-0 left-0 right-0 rounded-2xl px-4">
           <div className="flex items-center justify-between">
             <p>Net Total</p>
-            <p className="font-bold">{currencySymbol}{cartTotal.toFixed(2)}</p>
+            <p className="font-bold">{currencySymbol}{netTotal.toFixed(2)}</p>
           </div>
+          
+          <div className="mt-2 flex items-center justify-between">
+            <p>Tax Total</p>
+            <p className="font-bold">+{currencySymbol}{taxTotal.toFixed(2)}</p>
+          </div>
+
           {discount !== 0 ? <div className="mt-2 flex items-center justify-between">
             <div className="flex gap-2">
               <p>Discount</p>
@@ -408,10 +452,12 @@ export default function POSPage() {
             </div>
             <p className="font-bold text-red-400">-{currencySymbol}{discount.toFixed(2)}</p>
           </div>: <></>}
+
           <div className="mt-2 flex items-center justify-between">
             <p>Payable Total</p>
             <p className="font-bold">{currencySymbol}{payableTotal.toFixed(2)}</p>
           </div>
+          
           <div className="mt-4 flex flex-col gap-2">
             <button onClick={openApplyDiscountModal} className="px-4 py-3 rounded-2xl bg-ipos-grey-100 text-ipos-grey hover:bg-ipos-grey-50 flex justify-center gap-2">
               <IconDiscount2 />
