@@ -7,7 +7,7 @@ import { useNavigate } from 'react-router-dom'
 import { CURRENCIES } from "../config/currencies.config.js";
 import { toast } from 'react-hot-toast'
 import { blobToBase64 } from '../utils/blobToBase64.js'
-import { calculatePriceAfterTax } from '../utils/calculatePriceAfterTax.js'
+import { calculatePriceAfterTax, calculateTax } from '../utils/calculateTax.js'
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(' ')
@@ -457,6 +457,7 @@ export default function ProductsPage() {
                 const taxRate = product?.Tax?.dataValues?.taxRate || 0;
                 const taxType = product?.Tax?.dataValues?.type || null;
 
+                const calculatedTax = calculateTax(price, taxRate, taxType);
                 const priceAfterTax = calculatePriceAfterTax(price, taxRate, taxType);
                 // price + tax
 
