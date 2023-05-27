@@ -27,6 +27,7 @@ export default function POSPage() {
     customerList: [],
     selectedCustomer: null,
     discount: 0,
+    discountCode: null,
     cart: []
   });
 
@@ -37,7 +38,7 @@ export default function POSPage() {
   const txtEditCartItemIDRef = useRef(null);
   const txtEditCartItemQuantityRef = useRef(null);
 
-  const { products, categories, category, customers, selectedCustomer, customerList, cart, discount } = state;
+  const { products, categories, category, customers, selectedCustomer, customerList, cart, discount, discountCode } = state;
 
   const netTotal = cart.reduce((pV, cV, index, arr)=>{
     let itemTotal = 0;
@@ -146,9 +147,13 @@ export default function POSPage() {
       // customerType, cartTotal, taxTotal, payableTotal, discountValue, isDiscountApplied, CustomerId, PaymentTypeId, DiscountId, products
 
       const customerType = selectedCustomer.id === 'walk-in' ? CUSTOMER_TYPE.WALKIN : CUSTOMER_TYPE.CUSTOMER;
+      const customerId = selectedCustomer.id === 'walk-in' ? null : selectedCustomer.id;
 
-      const res = await window.api.addSale(customerType, netTotal, taxTotal, payableTotal, discount, discount !== 0, null, null, null, cartProducts);
-      console.log(res);
+      const res = await window.api.addSale(customerType, netTotal, taxTotal, payableTotal, discount, discount !== 0, customerId, null, discountCode, cartProducts);
+
+      // clear cart
+      // show option to print 
+
 
     } catch (error) {
       console.error(error);
@@ -240,6 +245,7 @@ export default function POSPage() {
         setState({
           ...state,
           discount: discountValue,
+          discountCode: discountCode,
         });
         closeApplyDiscountModal();
       } else if (discountType == DISCOUNT_TYPE.PERCENTAGE) {
@@ -248,6 +254,7 @@ export default function POSPage() {
         setState({
           ...state,
           discount: discountAmount,
+          discountCode: discountCode,
         });
         closeApplyDiscountModal();
       }
@@ -268,6 +275,7 @@ export default function POSPage() {
     setState({
       ...state,
       discount: 0,
+      discountCode: null,
     })
   };
   // discount
