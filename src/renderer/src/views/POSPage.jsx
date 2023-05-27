@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { IconArrowBackUp, IconClearAll, IconDiscount2, IconFilter, IconMinus, IconPencil, IconPlus, IconSearch, IconTrash, IconUserSearch, IconX } from "@tabler/icons-react";
+import { IconArrowBackUp, IconClearAll, IconDiscount2, IconFilter, IconMinus, IconPencil, IconPlus, IconReceipt, IconSearch, IconTrash, IconUserSearch, IconX } from "@tabler/icons-react";
 
 import { toast } from 'react-hot-toast'
 import { CURRENCIES } from "../config/currencies.config.js";
@@ -28,6 +28,8 @@ export default function POSPage() {
     selectedCustomer: null,
     discount: 0,
     discountCode: null,
+    paymentTypes: [],
+    showPaymentMethodModal: false,
     cart: []
   });
 
@@ -38,7 +40,10 @@ export default function POSPage() {
   const txtEditCartItemIDRef = useRef(null);
   const txtEditCartItemQuantityRef = useRef(null);
 
-  const { products, categories, category, customers, selectedCustomer, customerList, cart, discount, discountCode } = state;
+  const printInvoiceChkRef = useRef(null);
+  const paymentTypeRef = useRef(null);
+
+  const { products, categories, category, customers, selectedCustomer, customerList, cart, discount, discountCode, paymentTypes, showPaymentMethodModal } = state;
 
   const netTotal = cart.reduce((pV, cV, index, arr)=>{
     let itemTotal = 0;
@@ -72,6 +77,8 @@ export default function POSPage() {
       const productsResponse = await window.api.getProducts()
       const customersResponse = await window.api.getCustomers()
 
+      const paymentTypesResponse = await window.api.getPaymentTypes();
+
       const customersOptions = [];
       customersOptions.push({id: "walk-in",label: "Walk In Customer"});
 
@@ -90,7 +97,8 @@ export default function POSPage() {
         categories: categoriesResponse,
         customers: customersResponse,
         customerList: customersOptions,
-        selectedCustomer: customersOptions[0]
+        selectedCustomer: customersOptions[0],
+        paymentTypes: paymentTypesResponse
       });
     } catch (error) {
       console.error(error);
@@ -120,6 +128,7 @@ export default function POSPage() {
     });
     return;
   }
+  
 
 
   // cart
@@ -136,25 +145,55 @@ export default function POSPage() {
       cart: []
     });
   }
-  const btnCartCheckout = async () => {
+  const btnCartCheckout = () => {
+    openPaymentMethodModal();
+  };
+
+  const openPaymentMethodModal = () => {
+    setState({
+      ...state,
+      showPaymentMethodModal: true,
+    })
+  }
+  const closePaymentMethodModal = () => {
+    setState({
+      ...state,
+      showPaymentMethodModal: false,
+    })
+  }
+  const btnCreateSale = async () => {
+    const printInvoice = printInvoiceChkRef.current.checked;
+    const paymentTypeId = parseInt(paymentTypeRef.current.value) || null;
+
     try {
 
       const cartProducts = cart.map((cartItem, index)=>{
         return {id: cartItem.id, quantity: cartItem.quantity, price: cartItem.priceAfterTax};
       });
       
-
       // customerType, cartTotal, taxTotal, payableTotal, discountValue, isDiscountApplied, CustomerId, PaymentTypeId, DiscountId, products
 
       const customerType = selectedCustomer.id === 'walk-in' ? CUSTOMER_TYPE.WALKIN : CUSTOMER_TYPE.CUSTOMER;
       const customerId = selectedCustomer.id === 'walk-in' ? null : selectedCustomer.id;
 
-      const res = await window.api.addSale(customerType, netTotal, taxTotal, payableTotal, discount, discount !== 0, customerId, null, discountCode, cartProducts);
+      const res = await window.api.addSale(customerType, netTotal, taxTotal, payableTotal, discount, discount !== 0, customerId, paymentTypeId, discountCode, cartProducts);
 
-      // clear cart
-      // show option to print 
+      toast.success(`Sale: ${res.dataValues.id} created.`);
+      console.log(res);
 
-
+      // clear cart and dismiss popup
+      setState({
+        ...state,
+        cart: [],
+        discount: 0,
+        discountCode: null,
+        showPaymentMethodModal: false,
+      });
+      
+      if(printInvoice) {
+        //TODO: print invoice
+        
+      }
     } catch (error) {
       console.error(error);
       toast.error("Something went wrong!");
@@ -616,6 +655,71 @@ export default function POSPage() {
         </div>
       </div>
       {/* filter */}
+
+
+      {/* sale payment type */}
+      <div className={showPaymentMethodModal ? "w-full h-screen flex justify-center items-center fixed top-0 left-0 right-0":"hidden"}>
+        <div className="bg-white rounded-2xl px-5 py-6 shadow-xl w-96">
+          <div className="flex items-center justify-between gap-3 mt-4">
+            <div className="flex items-center gap-3">
+              <button
+                onClick={closePaymentMethodModal}
+                className="w-12 h-12 flex items-center justify-center rounded-2xl bg-ipos-grey-50 hover:bg-ipos-grey-100 text-ipos-grey"
+              >
+                <IconX />
+              </button>
+              <h3 className="text-ipos-grey">Payment Method</h3>
+            </div>
+            
+          </div>
+
+          <div className="mt-10">
+
+              <h1 className="text-center text-5xl font-bold">
+                {currencySymbol}{payableTotal}
+              </h1>
+
+              <label htmlFor="paymentMethod" className="mt-10 w-full block">Payment Method</label>
+              <select 
+                name="paymentMethod" id="paymentMethod" 
+                placeholder="Select Payment Method here..." 
+                className="mt-1 w-full block px-4 py-3 rounded-2xl border outline-indigo-500" 
+                ref={paymentTypeRef}
+              >
+                <option value="">Select Payment Method</option>
+                {
+                  paymentTypes.map((paymentType, index)=>{
+                    const id = paymentType.dataValues.id;
+                    const name = paymentType.dataValues.name;
+
+                    return <option key={index} value={id}>{name}</option>
+                  })
+                }
+              </select>
+
+              <label htmlFor="salePrintInvoice" className="mt-6 w-full flex items-center justify-between text-ipos-grey">
+                <div className="flex items-center gap-2">
+                  <IconReceipt />
+                  Print Invoice?
+                </div>
+                <div>
+                  <label className="relative inline-flex items-center cursor-pointer no-drag">
+                    <input ref={printInvoiceChkRef} defaultChecked name="salePrintInvoice" id="salePrintInvoice" type="checkbox" className="sr-only peer" />
+                    <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none  rounded-full peer dark:bg-gray-300 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-green-500"></div>
+                  </label>
+                </div>
+              </label>
+
+
+              <button onClick={btnCreateSale} className="mt-6 block bg-ipos-blue hover:bg-ipos-logo-color text-white rounded-2xl w-full px-4 py-3">
+                Create Sale
+              </button>
+
+          </div>
+
+        </div>
+      </div>
+      {/* sale payment type */}
 
     </div>
   );
