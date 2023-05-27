@@ -38,20 +38,6 @@ export default function POSPage() {
 
   const { products, categories, category, customers, selectedCustomer, customerList, cart, discount } = state;
 
-  // cart total
-  
-  // const cartTotal = cart.reduce((pV, cV, index, arr)=>{
-  //   const itemTotal = (cV.price * cV.quantity);
-
-  //   return pV+itemTotal;
-  // }, 0);
-
-  // const taxTotal = cart.reduce((pV, cV, index, arr)=>{
-  //   return pV+(cV.tax * cV.quantity);
-  // }, 0);
-
-  // const payableTotal = cartTotal + taxTotal - discount;
-
   const netTotal = cart.reduce((pV, cV, index, arr)=>{
     let itemTotal = 0;
 
@@ -79,30 +65,34 @@ export default function POSPage() {
   }, [])
 
   const _initPOS = async () => {
-    const categoriesResponse = await window.api.getCategories()
-    const productsResponse = await window.api.getProducts()
-    const customersResponse = await window.api.getCustomers()
+    try {
+      const categoriesResponse = await window.api.getCategories()
+      const productsResponse = await window.api.getProducts()
+      const customersResponse = await window.api.getCustomers()
 
-    const customersOptions = [];
-    customersOptions.push({id: "walk-in",label: "Walk In Customer"});
+      const customersOptions = [];
+      customersOptions.push({id: "walk-in",label: "Walk In Customer"});
 
-    if(customersResponse) {
-      customersResponse.forEach((customer)=>{
-        customersOptions.push({
-          id: customer.dataValues.id,
-          label: `${customer.dataValues.name} (${customer.dataValues.phone})`
-        });
-      })
+      if(customersResponse) {
+        customersResponse.forEach((customer)=>{
+          customersOptions.push({
+            id: customer.dataValues.id,
+            label: `${customer.dataValues.name} (${customer.dataValues.phone})`
+          });
+        })
+      }
+
+      setState({
+        ...state,
+        products: productsResponse,
+        categories: categoriesResponse,
+        customers: customersResponse,
+        customerList: customersOptions,
+        selectedCustomer: customersOptions[0]
+      });
+    } catch (error) {
+      console.error(error);
     }
-
-    setState({
-      ...state,
-      products: productsResponse,
-      categories: categoriesResponse,
-      customers: customersResponse,
-      customerList: customersOptions,
-      selectedCustomer: customersOptions[0]
-    });
   };
 
 
@@ -144,6 +134,24 @@ export default function POSPage() {
       cart: []
     });
   }
+  const btnCartCheckout = async () => {
+    try {
+
+      const cartProducts = cart.map((cartItem, index)=>{
+        return {id: cartItem.id, quantity: cartItem.quantity, price: cartItem.priceAfterTax};
+      });
+      
+
+      // customerType, cartTotal, taxTotal, payableTotal, discountValue, isDiscountApplied, CustomerId, PaymentTypeId, DiscountId, products
+
+      const res = await window.api.addSale(null, netTotal, taxTotal, payableTotal, discount, discount !== 0, null, null, null, cartProducts);
+      console.log(res);
+
+    } catch (error) {
+      console.error(error);
+      toast.error("Something went wrong!");
+    }
+  };
   // cart
 
 
@@ -457,13 +465,13 @@ export default function POSPage() {
             <p>Payable Total</p>
             <p className="font-bold">{currencySymbol}{payableTotal.toFixed(2)}</p>
           </div>
-          
+
           <div className="mt-4 flex flex-col gap-2">
             <button onClick={openApplyDiscountModal} className="px-4 py-3 rounded-2xl bg-ipos-grey-100 text-ipos-grey hover:bg-ipos-grey-50 flex justify-center gap-2">
               <IconDiscount2 />
               Apply Discount
             </button>
-            <button className="px-4 py-3 rounded-2xl bg-ipos-blue hover:bg-ipos-logo-color text-white block">
+            <button onClick={btnCartCheckout} className="px-4 py-3 rounded-2xl bg-ipos-blue hover:bg-ipos-logo-color text-white block">
               Checkout
             </button>
           </div>
