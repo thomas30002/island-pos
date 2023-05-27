@@ -8,6 +8,7 @@ import { Autocomplete } from "@mui/material";
 import { DISCOUNT_TYPE } from "../config/discountType.config.js";
 import { calculatePriceAfterTax, calculateTax } from "../utils/calculateTax.js";
 import { TAX_TYPES } from "../config/taxType.config.js";
+import { CUSTOMER_TYPE } from "../config/customerType.config.js";
 
 export default function POSPage() {
 
@@ -144,7 +145,9 @@ export default function POSPage() {
 
       // customerType, cartTotal, taxTotal, payableTotal, discountValue, isDiscountApplied, CustomerId, PaymentTypeId, DiscountId, products
 
-      const res = await window.api.addSale(null, netTotal, taxTotal, payableTotal, discount, discount !== 0, null, null, null, cartProducts);
+      const customerType = selectedCustomer.id === 'walk-in' ? CUSTOMER_TYPE.WALKIN : CUSTOMER_TYPE.CUSTOMER;
+
+      const res = await window.api.addSale(customerType, netTotal, taxTotal, payableTotal, discount, discount !== 0, null, null, null, cartProducts);
       console.log(res);
 
     } catch (error) {
@@ -370,9 +373,6 @@ export default function POSPage() {
               <IconClearAll />
             </button>
           </div>
-          {/* <select className="mt-4 w-full px-4 py-3 border rounded-2xl">
-              <option value="walk-in">Walk In Customer</option>
-          </select> */}
           
             <Autocomplete
             className="mt-4 w-full border rounded-2xl"

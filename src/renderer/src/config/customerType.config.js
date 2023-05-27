@@ -1,0 +1,4 @@
+export const CUSTOMER_TYPE = {
+    WALKIN: "WALKIN",
+    CUSTOMER: "CUSTOMER"
+}
