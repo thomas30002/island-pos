@@ -168,7 +168,7 @@ export default function POSPage() {
     try {
 
       const cartProducts = cart.map((cartItem, index)=>{
-        return {id: cartItem.id, quantity: cartItem.quantity, price: cartItem.priceAfterTax};
+        return {id: cartItem.id, quantity: cartItem.quantity, price: cartItem.priceAfterTax, name: cartItem.name};
       });
       
       // customerType, cartTotal, taxTotal, payableTotal, discountValue, isDiscountApplied, CustomerId, PaymentTypeId, DiscountId, products
@@ -178,8 +178,14 @@ export default function POSPage() {
 
       const res = await window.api.addSale(customerType, netTotal, taxTotal, payableTotal, discount, discount !== 0, customerId, paymentTypeId, discountCode, cartProducts);
 
-      toast.success(`Sale: ${res.dataValues.id} created.`);
-      console.log(res);
+      const saleId = res.dataValues.id;
+
+      toast.success(`Sale: ${saleId} created.`);
+      
+      if(printInvoice) {
+        //TODO: print invoice, open new window with the invoice design and run window.print to open print dialog.
+        
+      }
 
       // clear cart and dismiss popup
       setState({
@@ -189,18 +195,13 @@ export default function POSPage() {
         discountCode: null,
         showPaymentMethodModal: false,
       });
-      
-      if(printInvoice) {
-        //TODO: print invoice
-        
-      }
+
     } catch (error) {
       console.error(error);
       toast.error("Something went wrong!");
     }
   };
   // cart
-
 
 
   // modal: cart item quantity edit
