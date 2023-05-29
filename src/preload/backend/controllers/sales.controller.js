@@ -35,3 +35,13 @@ export async function getSales() {
     });
     return sales;
 }
+
+export async function getSale(id) {
+    const sale = await Sale.findOne({
+        include: [{all: true}],
+        where: {
+            id
+        }
+    });
+    return sale;
+}

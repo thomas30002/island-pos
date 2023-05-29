@@ -63,8 +63,8 @@ export default function Navbar() {
             key={item.path} 
             className={
               item.path == pathname ? 
-              'w-full flex rounded-2xl gap-4 px-6 py-4 bg-ipos-blue-50 text-ipos-blue transition hover:bg-ipos-logo-color hover:text-white':
-              'w-full flex rounded-2xl gap-4 px-6 py-4 bg-white text-ipos-grey transition hover:bg-ipos-grey-50'
+              'w-full flex rounded-2xl gap-4 px-6 py-4 bg-ipos-blue-50 text-ipos-blue transition hover:bg-ipos-logo-color hover:text-white outline-none':
+              'w-full flex rounded-2xl gap-4 px-6 py-4 bg-white text-ipos-grey transition hover:bg-ipos-grey-50 outline-none'
             }
           >
             {item.icon} {item.text}
