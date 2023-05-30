@@ -140,11 +140,12 @@ export default function ExpensesPage() {
     {
       name: "#",
       selector: row => row.dataValues.id,
+      width: "130px"
     },
     {
       name: "Expense Name",
       selector: row => row.dataValues.name,
-      grow: 5
+      width: "290px"
     },
     {
       name: "Amount",
