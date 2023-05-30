@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState, Fragment } from 'react'
 import Search from '../components/Search.jsx'
 
-import { IconDotsVertical, IconPlus, IconTrash, IconX } from '@tabler/icons-react'
+import { IconDotsVertical, IconEye, IconPencil, IconPlus, IconTrash, IconX } from '@tabler/icons-react'
 
 import { toast } from 'react-hot-toast'
 import { Menu, Transition } from '@headlessui/react'
@@ -30,7 +30,7 @@ function OptionsMenu({ onBtnDelete, onBtnUpdate, onBtnView }) {
         leaveFrom="transform opacity-100 scale-100"
         leaveTo="transform opacity-0 scale-95"
       >
-        <Menu.Items className="absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+        <Menu.Items className="absolute z-50 right-0 mt-2 w-56 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
           
           <div className="py-1">
             <Menu.Item>
@@ -80,6 +80,31 @@ function OptionsMenu({ onBtnDelete, onBtnUpdate, onBtnView }) {
         </Menu.Items>
       </Transition>
     </Menu>
+  )
+}
+
+function OptionsMenu2({ onBtnDelete, onBtnUpdate, onBtnView }) {
+  return (
+    <div className='flex gap-2'>
+      <button
+        onClick={onBtnView}
+        className='w-7 h-7 rounded-full flex items-center justify-center bg-gray-100 hover:bg-gray-200 text-gray-600'
+      >
+        <IconEye />
+      </button>
+      <button
+        onClick={onBtnUpdate}
+        className='w-7 h-7 rounded-full flex items-center justify-center bg-indigo-50 hover:bg-indigo-100 text-indigo-400'
+      >
+        <IconPencil />
+      </button>
+      <button
+        onClick={onBtnDelete}
+        className='w-7 h-7 rounded-full flex items-center justify-center bg-red-50 hover:bg-red-100 text-red-400'
+      >
+        <IconTrash />
+      </button>
+    </div>
   )
 }
 
@@ -153,6 +178,12 @@ export default function CustomersPage() {
   }
 
   const btnDeleteCustomer = async (id) => {
+
+    const isConfirm = window.confirm("Are you sure? This process is not reversible ✋🛑");
+    if(!isConfirm) {
+      return;
+    }
+
     try {
       const res = await window.api.removeCustomer(id)
       await _getAllCustomers()
@@ -257,7 +288,7 @@ export default function CustomersPage() {
         const email = row.dataValues.email || "";
         const address = row.dataValues.address || "";
 
-        return <OptionsMenu 
+        return <OptionsMenu2 
         onBtnDelete={()=>{
           btnDeleteCustomer(id);
         }} 
