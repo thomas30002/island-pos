@@ -155,6 +155,7 @@ export default function ExpensesPage() {
     {
       name: "Date",
       selector: row => new Date(row.dataValues.date).toLocaleString(),
+      width: "200px"
     },
     {
       name: "Notes",
