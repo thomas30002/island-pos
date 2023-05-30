@@ -50,6 +50,20 @@ function OptionsMenu({onBtnDelete}) {
 </Menu>;
 }
 
+function OptionsMenu2({ onBtnDelete }) {
+  return (
+    <div className='flex gap-2'>
+      
+      <button
+        onClick={onBtnDelete}
+        className='w-7 h-7 rounded-full flex items-center justify-center bg-red-50 hover:bg-red-100 text-red-400'
+      >
+        <IconTrash />
+      </button>
+    </div>
+  )
+}
+
 export default function ExpensesPage() {
 
   const [showAddModal, setShowAddModal] = useState(false)
@@ -124,6 +138,11 @@ export default function ExpensesPage() {
   }
 
   const btnDeleteExpense = async id => {
+    const isConfirm = window.confirm("Are you sure? This process is not reversible ✋🛑");
+    if(!isConfirm) {
+      return;
+    }
+    
     try {
       const res = await window.api.removeExpense(id);
       await _getAllExpenses();
@@ -167,7 +186,7 @@ export default function ExpensesPage() {
       name: "Actions",
       sortable: false,
       cell: (row, index, column, id) => {
-        return <OptionsMenu onBtnDelete={()=>{
+        return <OptionsMenu2 onBtnDelete={()=>{
           btnDeleteExpense(row.dataValues.id);
         }} />;
       }
