@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState, Fragment }  from 'react'
 import Search from '../components/Search.jsx'
-import { IconDotsVertical, IconPlus, IconTrash, IconX } from '@tabler/icons-react'
+import { IconArrowDown, IconDotsVertical, IconPlus, IconTrash, IconX } from '@tabler/icons-react'
 
 import { toast } from 'react-hot-toast'
 import { CURRENCIES } from "../config/currencies.config.js";
@@ -48,6 +48,20 @@ function OptionsMenu({onBtnDelete}) {
     </Menu.Items>
   </Transition>
 </Menu>;
+}
+
+function OptionsMenu2({ onBtnDelete }) {
+  return (
+    <div className='flex gap-2'>
+      
+      <button
+        onClick={onBtnDelete}
+        className='w-7 h-7 rounded-full flex items-center justify-center bg-red-50 hover:bg-red-100 text-red-400'
+      >
+        <IconTrash />
+      </button>
+    </div>
+  )
 }
 
 export default function ExpensesPage() {
@@ -124,6 +138,11 @@ export default function ExpensesPage() {
   }
 
   const btnDeleteExpense = async id => {
+    const isConfirm = window.confirm("Are you sure? This process is not reversible ✋🛑");
+    if(!isConfirm) {
+      return;
+    }
+    
     try {
       const res = await window.api.removeExpense(id);
       await _getAllExpenses();
@@ -140,21 +159,26 @@ export default function ExpensesPage() {
     {
       name: "#",
       selector: row => row.dataValues.id,
-      width: "130px"
+      width: "130px",
+      sortable: true,
     },
     {
       name: "Expense Name",
       selector: row => row.dataValues.name,
-      width: "290px"
+      width: "290px",
+      sortable: true,
     },
     {
       name: "Amount",
       selector: row => row.dataValues.amount,
-      format: (row, index) => `${currencySymbol}${row.dataValues.amount}`
+      format: (row, index) => `${currencySymbol}${row.dataValues.amount}`,
+      sortable: true,
     },
     {
       name: "Date",
       selector: row => new Date(row.dataValues.date).toLocaleString(),
+      width: "200px",
+      sortable: true,
     },
     {
       name: "Notes",
@@ -166,7 +190,7 @@ export default function ExpensesPage() {
       name: "Actions",
       sortable: false,
       cell: (row, index, column, id) => {
-        return <OptionsMenu onBtnDelete={()=>{
+        return <OptionsMenu2 onBtnDelete={()=>{
           btnDeleteExpense(row.dataValues.id);
         }} />;
       }
@@ -189,7 +213,7 @@ export default function ExpensesPage() {
 
       <div className="w-full">
        
-        <DataTable columns={columns} data={expenses} pagination responsive  />
+        <DataTable columns={columns} data={expenses} pagination responsive sortIcon={<IconArrowDown />} />
 
       </div>
 

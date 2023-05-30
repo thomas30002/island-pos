@@ -1,10 +1,11 @@
 import React, { useEffect, useRef, useState, Fragment } from 'react'
 import Search from '../components/Search.jsx'
 
-import { IconDotsVertical, IconPlus, IconTrash, IconX } from '@tabler/icons-react'
+import { IconDotsVertical, IconEye, IconPencil, IconPlus, IconTrash, IconX } from '@tabler/icons-react'
 
 import { toast } from 'react-hot-toast'
 import { Menu, Transition } from '@headlessui/react'
+import DataTable from 'react-data-table-component'
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(' ')
@@ -29,7 +30,7 @@ function OptionsMenu({ onBtnDelete, onBtnUpdate, onBtnView }) {
         leaveFrom="transform opacity-100 scale-100"
         leaveTo="transform opacity-0 scale-95"
       >
-        <Menu.Items className="absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+        <Menu.Items className="absolute z-50 right-0 mt-2 w-56 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
           
           <div className="py-1">
             <Menu.Item>
@@ -79,6 +80,31 @@ function OptionsMenu({ onBtnDelete, onBtnUpdate, onBtnView }) {
         </Menu.Items>
       </Transition>
     </Menu>
+  )
+}
+
+function OptionsMenu2({ onBtnDelete, onBtnUpdate, onBtnView }) {
+  return (
+    <div className='flex gap-2'>
+      <button
+        onClick={onBtnView}
+        className='w-7 h-7 rounded-full flex items-center justify-center bg-gray-100 hover:bg-gray-200 text-gray-600'
+      >
+        <IconEye />
+      </button>
+      <button
+        onClick={onBtnUpdate}
+        className='w-7 h-7 rounded-full flex items-center justify-center bg-indigo-50 hover:bg-indigo-100 text-indigo-400'
+      >
+        <IconPencil />
+      </button>
+      <button
+        onClick={onBtnDelete}
+        className='w-7 h-7 rounded-full flex items-center justify-center bg-red-50 hover:bg-red-100 text-red-400'
+      >
+        <IconTrash />
+      </button>
+    </div>
   )
 }
 
@@ -152,6 +178,12 @@ export default function CustomersPage() {
   }
 
   const btnDeleteCustomer = async (id) => {
+
+    const isConfirm = window.confirm("Are you sure? This process is not reversible ✋🛑");
+    if(!isConfirm) {
+      return;
+    }
+
     try {
       const res = await window.api.removeCustomer(id)
       await _getAllCustomers()
@@ -219,6 +251,60 @@ export default function CustomersPage() {
   // 
 
 
+  // data table
+  const columns = [
+    {
+      name: "#",
+      selector: row => row.dataValues.id,
+      width: "130px"
+    },
+    {
+      name: "Customer Name",
+      selector: row => row.dataValues.name,
+      width: "290px"
+    },
+    {
+      name: "Email",
+      selector: row => row.dataValues.email,
+    },
+    {
+      name: "Phone",
+      selector: row => row.dataValues.phone,
+      width: "200px"
+    },
+    {
+      name: "Address",
+      selector: row => row.dataValues.address,
+      sortable: false,
+      maxWidth: "218px"
+    },
+    {
+      name: "Actions",
+      sortable: false,
+      cell: (row, index, column, rowid) => {
+        const id = row.dataValues.id;
+        const name = row.dataValues.name || "";
+        const phone = row.dataValues.phone || "";
+        const email = row.dataValues.email || "";
+        const address = row.dataValues.address || "";
+
+        return <OptionsMenu2 
+        onBtnDelete={()=>{
+          btnDeleteCustomer(id);
+        }} 
+        onBtnUpdate={()=>{
+          btnViewCustomer(id, name, phone, email, address);
+        }}
+        onBtnView={()=>{
+          btnViewCustomer(id, name, phone, email, address);
+        }}
+        />;
+        
+      }
+    }
+  ];
+  // data table
+
   return (
     <div className="py-6">
       <div className="px-8 pb-2 flex items-center justify-end gap-4 border-b border-ipos-grey-100">
@@ -234,90 +320,7 @@ export default function CustomersPage() {
       </div>
 
       <div className="w-full">
-        <table className="w-full border-collapse">
-          <thead>
-            <tr className="border-b border-b-ipos-grey-100">
-              <th className="py-3 font-normal pl-4 text-left">#</th>
-              <th className="py-3 font-normal text-left">Customer Name</th>
-              <th className="py-3 font-normal text-left">Email</th>
-              <th className="py-3 font-normal text-left">Phone</th>
-              <th className="py-3 font-normal text-left max-w-[218px]">Address</th>
-              <th className="py-3 font-normal text-left">Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            {/* <tr className="border-b border-b-ipos-grey-100">
-              <td className="py-3 pl-4">1</td>
-              <td className="py-3">Alisa Tin</td>
-              <td className="py-3">alisa@mail.com</td>
-              <td className="py-3">984-776-7480</td>
-              <td className="py-3">3f, New BI Tower, NY, USA 30011</td>
-              <td className="py-3">
-                <button>
-                  <IconDotsVertical />
-                </button>
-              </td>
-            </tr> */}
-
-            {
-              customers.map((customer, index)=>{
-
-                const id = customer.dataValues.id;
-                const name = customer.dataValues.name || "";
-                const phone = customer.dataValues.phone || "";
-                const email = customer.dataValues.email || "";
-                const address = customer.dataValues.address || "";
-
-                return <tr key={index} className='border-b border-b-ipos-grey-100'>
-                  <td className="py-3 pl-4">{id}</td>
-                  <td className="py-3">{name}</td>
-                  <td className="py-3">{email}</td>
-                  <td className="py-3">{phone}</td>
-                  <td className="py-3 max-w-[218px] overflow-hidden text-ellipsis whitespace-nowrap">{address}</td>
-                  <td className="py-3">
-                    <OptionsMenu 
-                    onBtnDelete={()=>{
-                      btnDeleteCustomer(id);
-                    }} 
-                    onBtnUpdate={()=>{
-                      btnViewCustomer(id, name, phone, email, address);
-                    }}
-                    onBtnView={()=>{
-                      btnViewCustomer(id, name, phone, email, address);
-                    }}
-                    />
-                  </td>
-                </tr>
-              })
-            }
-            
-          </tbody>
-        </table>
-
-        {/* pagination */}
-        <div className="gap-4 flex items-center justify-end px-4 py-2 border-b border-b-ipos-grey-100 bg-white ">
-          <div className="flex gap-2">
-            <button className="text-sm bg-ipos-grey-50 hover:bg-ipos-grey-100 rounded-2xl w-8 h-8">
-              1
-            </button>
-            <button className="text-sm bg-white hover:bg-ipos-grey-100 rounded-2xl w-8 h-8">
-              2
-            </button>
-            <button className="text-sm bg-white hover:bg-ipos-grey-100 rounded-2xl w-8 h-8">
-              3
-            </button>
-          </div>
-
-          <p className="text-sm">Showing 5 of 40</p>
-
-          <select className="no-drag bg-ipos-grey-50 rounded-xl px-2 py-2 outline-ipos-blue">
-            <option value="10">10</option>
-            <option value="25">25</option>
-            <option value="50">50</option>
-            <option value="100">100</option>
-          </select>
-        </div>
-        {/* pagination */}
+        <DataTable columns={columns} data={customers} pagination />
       </div>
 
       {/* modal */}
