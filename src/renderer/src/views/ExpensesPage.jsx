@@ -5,6 +5,7 @@ import { IconDotsVertical, IconPlus, IconTrash, IconX } from '@tabler/icons-reac
 import { toast } from 'react-hot-toast'
 import { CURRENCIES } from "../config/currencies.config.js";
 import { Menu, Transition } from '@headlessui/react'
+import DataTable from 'react-data-table-component';
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(' ')
@@ -133,6 +134,46 @@ export default function ExpensesPage() {
     }
   };
 
+
+  // data table
+  const columns = [
+    {
+      name: "#",
+      selector: row => row.dataValues.id,
+      width: "130px"
+    },
+    {
+      name: "Expense Name",
+      selector: row => row.dataValues.name,
+      width: "290px"
+    },
+    {
+      name: "Amount",
+      selector: row => row.dataValues.amount,
+      format: (row, index) => `${currencySymbol}${row.dataValues.amount}`
+    },
+    {
+      name: "Date",
+      selector: row => new Date(row.dataValues.date).toLocaleString(),
+    },
+    {
+      name: "Notes",
+      selector: row => row.dataValues.notes,
+      sortable: false,
+      grow: 2
+    },
+    {
+      name: "Actions",
+      sortable: false,
+      cell: (row, index, column, id) => {
+        return <OptionsMenu onBtnDelete={()=>{
+          btnDeleteExpense(row.dataValues.id);
+        }} />;
+      }
+    }
+  ];
+  // data table
+
   return (
     <div className='py-6'>
       <div className="px-8 pb-2 flex items-center justify-end gap-4 border-b border-ipos-grey-100">
@@ -147,48 +188,9 @@ export default function ExpensesPage() {
       </div>
 
       <div className="w-full">
-        <table className='w-full border-collapse'>
-          <thead>
-            <tr className='border-b border-b-ipos-grey-100'>
-              <th className='py-3 pl-4 text-left'>#</th>
-              <th className='py-3 text-left w-80'>Expense Name</th>
-              <th className='py-3 text-left'>Amount</th>
-              <th className='py-3 text-left'>Date</th>
-              <th className='py-3 text-left max-w-[148px]'>Notes</th>
-              <th className='py-3 text-left'>Action</th>
-            </tr>
-          </thead>
-          <tbody>
+       
+        <DataTable columns={columns} data={expenses} pagination responsive  />
 
-            {
-              expenses.map((expense, index)=>{
-
-                const id = expense.dataValues.id;
-                const name = expense.dataValues?.name || "";
-                const amount = expense.dataValues?.amount || 0;
-                const date = expense.dataValues?.date || "";
-                const notes = expense.dataValues?.notes || "";
-
-                const dateStr = new Date(date).toLocaleDateString();
-
-                return (<tr key={index} className='border-b border-b-ipos-grey-100'>
-                  <td className='py-3 pl-4'>{id}</td>
-                  <td className='py-3 w-80'>{name}</td>
-                  <td className='py-3'>{amount}{currencySymbol}</td>
-                  <td className='py-3'>{dateStr}</td>
-                  <td className="py-3 max-w-[148px] overflow-hidden text-ellipsis whitespace-nowrap">{notes}</td>
-                  <td className='py-3'>
-                    <OptionsMenu onBtnDelete={()=>{
-                      btnDeleteExpense(id);
-                    }} />
-                  </td>
-                </tr>)
-              })
-            }
-
-            
-          </tbody>
-        </table>
       </div>
 
 
