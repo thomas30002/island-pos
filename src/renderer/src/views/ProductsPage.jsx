@@ -1,6 +1,6 @@
 import React, {Fragment, useEffect, useRef, useState} from 'react'
 import Search from '../components/Search.jsx'
-import { IconCategory2, IconDotsCircleHorizontal, IconDotsVertical, IconDownload, IconFileImport, IconPencil, IconPhoto, IconPlus, IconQrcode, IconTrash, IconUpload, IconX } from '@tabler/icons-react'
+import { IconArrowDown, IconCategory2, IconDotsCircleHorizontal, IconDotsVertical, IconDownload, IconEye, IconFileImport, IconPencil, IconPhoto, IconPlus, IconQrcode, IconTrash, IconUpload, IconX } from '@tabler/icons-react'
 
 import { Menu, Transition } from '@headlessui/react'
 import { useNavigate } from 'react-router-dom'
@@ -8,6 +8,7 @@ import { CURRENCIES } from "../config/currencies.config.js";
 import { toast } from 'react-hot-toast'
 import { blobToBase64 } from '../utils/blobToBase64.js'
 import { calculatePriceAfterTax, calculateTax } from '../utils/calculateTax.js'
+import DataTable from 'react-data-table-component'
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(' ')
@@ -153,6 +154,31 @@ function ProductOptionsMenu({ onBtnDelete, onBtnUpdate, onBtnView }) {
         </Menu.Items>
       </Transition>
     </Menu>
+  )
+}
+
+function ProductOptionsMenu2({ onBtnDelete, onBtnUpdate, onBtnView }) {
+  return (
+    <div className='flex gap-2'>
+      <button
+        onClick={onBtnView}
+        className='w-7 h-7 rounded-full flex items-center justify-center bg-gray-100 hover:bg-gray-200 text-gray-600'
+      >
+        <IconEye />
+      </button>
+      <button
+        onClick={onBtnUpdate}
+        className='w-7 h-7 rounded-full flex items-center justify-center bg-indigo-50 hover:bg-indigo-100 text-indigo-400'
+      >
+        <IconPencil />
+      </button>
+      <button
+        onClick={onBtnDelete}
+        className='w-7 h-7 rounded-full flex items-center justify-center bg-red-50 hover:bg-red-100 text-red-400'
+      >
+        <IconTrash />
+      </button>
+    </div>
   )
 }
 
@@ -331,6 +357,11 @@ export default function ProductsPage() {
   }
 
   const btnDeleteProduct = async id => {
+    const isConfirm = window.confirm("Are you sure? This process is not reversible ✋🛑");
+    if(!isConfirm) {
+      return;
+    }
+
     try {
       const res = await window.api.removeProduct(id)
       await _getAllProducts()
@@ -402,6 +433,112 @@ export default function ProductsPage() {
   }
   // update product 
 
+
+  // data table
+  const columns = [
+    {
+      name: "#",
+      selector: row => row.dataValues.id,
+      width: "80px",
+      sortable: true,
+    },
+    {
+      name: "Image",
+      sortable: false,
+      cell: (row, index, column, rowid) => {
+        const productImage = row.dataValues.image;
+        const name = row.dataValues.name;
+
+        return productImage !== undefined && productImage !== null && productImage !== "" 
+          ? <img src={productImage} alt="product img" className='w-16 h-16 rounded-2xl object-cover m-2' /> 
+          : <div className='w-16 h-16 rounded-2xl flex items-center justify-center bg-gray-100 text-gray-400'>
+            {name[0].toUpperCase()}.
+          </div>;
+      },
+    },
+    {
+      name: "Product Name",
+      selector: row => row.dataValues.name,
+      width: "290px",
+      sortable: true,
+    },
+    {
+      name: "Price",
+      sortable: true,
+      cell: (row, index, column, rowid) => {
+
+        const price = row.dataValues.price;
+
+        // price + tax
+        const taxRate = row?.Tax?.dataValues?.taxRate || 0;
+        const taxType = row?.Tax?.dataValues?.type || null;
+
+        const calculatedTax = calculateTax(price, taxRate, taxType);
+        const priceAfterTax = calculatePriceAfterTax(price, taxRate, taxType);
+        // price + tax
+
+        return `${currencySymbol}${priceAfterTax}`;
+      },
+    },
+    {
+      name: "Cost",
+      selector: row => row.dataValues.cost,
+      format: (row, index) => `${currencySymbol}${row.dataValues.cost}`,
+      sortable: true,
+    },
+    {
+      name: "Category",
+      selector: row => row.Category?.dataValues?.name,
+      sortable: true,
+      maxWidth: "218px"
+    },
+    {
+      name: "SKU",
+      selector: row => row.dataValues.sku,
+    },
+    {
+      name: "Barcode",
+      selector: row => row.dataValues.barcode,
+    },
+    {
+      name: "Sold By",
+      selector: row => row.dataValues.soldBy,
+      sortable: true,
+    },
+    {
+      name: "Actions",
+      sortable: false,
+      cell: (row, index, column, rowid) => {
+        const id = row.dataValues.id;
+        const name = row.dataValues.name;
+        const price = row.dataValues.price;
+        const cost = row.dataValues.cost;
+        const category = row.Category?.dataValues?.name || "";
+        const categoryId = row.Category?.dataValues?.id;
+        const taxId = row.Tax?.dataValues?.id;
+        const sku = row.dataValues.sku;
+        const barcode = row.dataValues.barcode;
+        const soldBy = row.dataValues.soldBy;
+
+        const productImage = row.dataValues.image;
+
+        return <ProductOptionsMenu2 
+          onBtnDelete={()=>{
+            btnDeleteProduct(id);
+          }} 
+          onBtnUpdate={()=>{
+            btnUpdateProduct(id, name, price, cost, categoryId, sku, barcode, soldBy, productImage, taxId);
+          }} 
+          onBtnView={()=>{
+            btnUpdateProduct(id, name, price, cost, categoryId, sku, barcode, soldBy, productImage, taxId);
+          }}  
+        />
+        
+      }
+    }
+  ];
+  // data table
+
   return (
     <div className='py-6'>
       <div className="px-8 pb-2 flex flex-wrap items-center justify-end gap-4 border-b border-ipos-grey-100">
@@ -421,102 +558,7 @@ export default function ProductsPage() {
       </div>
 
       <div className="w-full">
-        <table className='w-full border-collapse overflow-x-scroll'>
-          <thead>
-            <tr className='border-b border-b-ipos-grey-100'>
-              <th className='py-3 font-normal pl-4 text-left'>#</th>
-              <th className='py-3 font-normal text-left'>Image</th>
-              <th className='py-3 font-normal text-left'>Product Name</th>
-              <th className='py-3 font-normal text-left'>Price</th>
-              <th className='py-3 font-normal text-left'>Cost</th>
-              <th className='py-3 font-normal text-left'>Category</th>
-              <th className='py-3 font-normal text-left'>SKU</th>
-              <th className='py-3 font-normal text-left'>Barcode</th>
-              <th className='py-3 font-normal text-left'>Sold by (Weight/Each)</th>
-              <th className='py-3 font-normal text-left'>Action</th>
-            </tr>
-          </thead>
-          <tbody>
-
-            {
-              products.map((product, index)=>{
-                const id = product.dataValues.id;
-                const name = product.dataValues.name;
-                const price = product.dataValues.price;
-                const cost = product.dataValues.cost;
-                const category = product.Category?.dataValues?.name || "";
-                const categoryId = product.Category?.dataValues?.id;
-                const taxId = product.Tax?.dataValues?.id;
-                const sku = product.dataValues.sku;
-                const barcode = product.dataValues.barcode;
-                const soldBy = product.dataValues.soldBy;
-
-                const productImage = product.dataValues.image;
-
-                // price + tax
-                const taxRate = product?.Tax?.dataValues?.taxRate || 0;
-                const taxType = product?.Tax?.dataValues?.type || null;
-
-                const calculatedTax = calculateTax(price, taxRate, taxType);
-                const priceAfterTax = calculatePriceAfterTax(price, taxRate, taxType);
-                // price + tax
-
-                return <tr className='border-b border-b-ipos-grey-100' key={index}>
-                  <td className='py-3 pl-4'>{index+1}</td>
-                  <td className='py-3'>
-                    {
-                      productImage !== undefined && productImage !== null && productImage !== "" 
-                      ? <img src={productImage} alt="product img" className='w-16 h-16 rounded-2xl object-cover' /> 
-                      : <div className='w-16 h-16 rounded-2xl flex items-center justify-center bg-gray-100 text-gray-400'>
-                        {name[0].toUpperCase()}.
-                      </div>
-                    }
-                  </td>
-                  <td className='py-3'>{name}</td>
-                  <td className='py-3'>{currencySymbol}{priceAfterTax}</td>
-                  <td className="py-3">{currencySymbol}{cost}</td>
-                  <td className="py-3">{category}</td>
-                  <td className="py-3">{sku}</td>
-                  <td className="py-3">{barcode}</td>
-                  <td className="py-3">{soldBy}</td>
-                  <td className='py-3'>
-                    <ProductOptionsMenu 
-                      onBtnDelete={()=>{
-                        btnDeleteProduct(id);
-                      }} 
-                      onBtnUpdate={()=>{
-                        btnUpdateProduct(id, name, price, cost, categoryId, sku, barcode, soldBy, productImage, taxId);
-                      }} 
-                      onBtnView={()=>{
-                        btnUpdateProduct(id, name, price, cost, categoryId, sku, barcode, soldBy, productImage, taxId);
-                      }}  
-                    />
-                  </td>
-                </tr>
-              })
-            }
-            
-          </tbody>
-        </table>
-
-        {/* pagination */}
-      <div className="gap-4 flex items-center justify-end px-4 py-2 border-b border-b-ipos-grey-100 bg-white ">
-        <div className="flex gap-2">
-          <button className='text-sm bg-ipos-grey-50 hover:bg-ipos-grey-100 rounded-2xl w-8 h-8'>1</button>
-          <button className='text-sm bg-white hover:bg-ipos-grey-100 rounded-2xl w-8 h-8'>2</button>
-          <button className='text-sm bg-white hover:bg-ipos-grey-100 rounded-2xl w-8 h-8'>3</button>
-        </div>
-
-        <p className='text-sm'>Showing 5 of 40</p>
-
-        <select className='no-drag bg-ipos-grey-50 rounded-xl px-2 py-2 outline-ipos-blue'>
-          <option value="10">10</option>
-          <option value="25">25</option>
-          <option value="50">50</option>
-          <option value="100">100</option>
-        </select>
-      </div>
-      {/* pagination */}
+        <DataTable columns={columns} data={products} pagination responsive sortIcon={<IconArrowDown />} />
       </div>
 
       {/* modal */}
