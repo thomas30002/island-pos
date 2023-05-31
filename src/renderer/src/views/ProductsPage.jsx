@@ -465,6 +465,19 @@ export default function ProductsPage() {
     {
       name: "Price",
       sortable: true,
+      selector: (row) => {
+        const price = row.dataValues.price;
+
+        // price + tax
+        const taxRate = row?.Tax?.dataValues?.taxRate || 0;
+        const taxType = row?.Tax?.dataValues?.type || null;
+
+        const calculatedTax = calculateTax(price, taxRate, taxType);
+        const priceAfterTax = calculatePriceAfterTax(price, taxRate, taxType);
+        // price + tax
+
+        return priceAfterTax;
+      },
       cell: (row, index, column, rowid) => {
 
         const price = row.dataValues.price;
