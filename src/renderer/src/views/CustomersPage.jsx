@@ -6,6 +6,7 @@ import { IconDotsVertical, IconEye, IconPencil, IconPlus, IconTrash, IconX } fro
 import { toast } from 'react-hot-toast'
 import { Menu, Transition } from '@headlessui/react'
 import DataTable from 'react-data-table-component'
+import { IconArrowDown } from '@tabler/icons-react'
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(' ')
@@ -320,7 +321,7 @@ export default function CustomersPage() {
       </div>
 
       <div className="w-full">
-        <DataTable columns={columns} data={customers} pagination />
+        <DataTable columns={columns} data={customers} pagination responsive sortIcon={<IconArrowDown />} />
       </div>
 
       {/* modal */}
