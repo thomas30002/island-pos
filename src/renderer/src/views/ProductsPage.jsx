@@ -197,6 +197,9 @@ export default function ProductsPage() {
   const [products, setProducts] = useState([])
   const [productImage, setProductImage] = useState('');
 
+  const [searchValue, setSearchValue] = useState("");
+
+
   const navigate = useNavigate();
 
   const txtProductTitleRef = useRef(null)
@@ -439,7 +442,7 @@ export default function ProductsPage() {
     {
       name: "#",
       selector: row => row.dataValues.id,
-      width: "80px",
+      width: "60px",
       sortable: true,
     },
     {
@@ -459,7 +462,7 @@ export default function ProductsPage() {
     {
       name: "Product Name",
       selector: row => row.dataValues.name,
-      width: "290px",
+      width: "220px",
       sortable: true,
     },
     {
@@ -520,6 +523,7 @@ export default function ProductsPage() {
     },
     {
       name: "Actions",
+      width: "150px",
       sortable: false,
       cell: (row, index, column, rowid) => {
         const id = row.dataValues.id;
@@ -552,6 +556,31 @@ export default function ProductsPage() {
   ];
   // data table
 
+  const productSearchFilter = (product)=>{
+    const id = product.dataValues.id;
+    const name = product.dataValues.name;
+    const category = product.Category?.dataValues?.name || "";
+    const sku = product.dataValues.sku;
+    const barcode = product.dataValues.barcode;
+
+    if(searchValue == "") {
+      return true;
+    }
+    if(searchValue.startsWith("#")) {
+      const searchId = parseInt(searchValue.replace("#", ""));
+      if(!searchId) {
+        return true;
+      }
+      return id == searchId;
+    }
+    if(String(name).toLowerCase().includes(searchValue.toLowerCase()) || String(category).toLowerCase().includes(searchValue.toLowerCase()) || String(sku).toLowerCase().includes(searchValue.toLowerCase()) || String(barcode).toLowerCase().includes(searchValue.toLowerCase())) {
+      return true;
+    }
+    return false;
+  };
+
+  const productsFiltered = products.filter(productSearchFilter);
+
   return (
     <div className='py-6'>
       <div className="px-8 pb-2 flex flex-wrap items-center justify-end gap-4 border-b border-ipos-grey-100">
@@ -567,11 +596,11 @@ export default function ProductsPage() {
 
         <OptionsMenu onBtnPrintQR={onBtnPrintQR} onBtnExport={onBtnExport} onBtnImport={onBtnImport} />
 
-        <Search />
+        <Search searchValue={searchValue} setSearchValue={setSearchValue} />
       </div>
 
       <div className="w-full">
-        <DataTable columns={columns} data={products} pagination responsive sortIcon={<IconArrowDown />} />
+        <DataTable columns={columns} data={productsFiltered} pagination responsive sortIcon={<IconArrowDown />} />
       </div>
 
       {/* modal */}
