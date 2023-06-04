@@ -25,6 +25,11 @@ button, a, input, select, option, .no-drag {
     -webkit-app-region: no-drag;
 }
 
+.show-scrollbar::-webkit-scrollbar {
+    width: 4px;
+    display: block;
+}
+
 /* width */
 ::-webkit-scrollbar {
     width: 4px;
