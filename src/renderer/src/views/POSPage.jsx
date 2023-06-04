@@ -9,6 +9,7 @@ import { DISCOUNT_TYPE } from "../config/discountType.config.js";
 import { calculatePriceAfterTax, calculateTax } from "../utils/calculateTax.js";
 import { TAX_TYPES } from "../config/taxType.config.js";
 import { CUSTOMER_TYPE } from "../config/customerType.config.js";
+import { Transition } from "@headlessui/react";
 
 export default function POSPage() {
 
@@ -763,7 +764,17 @@ export default function POSPage() {
 
 
       {/* search */}
-      <div className={showSearchModal ? "w-full h-screen flex items-start justify-center fixed top-0 left-0 right-0 bg-black/30 " : "hidden"}>
+      <Transition
+      className="w-full h-screen flex items-start justify-center fixed top-0 left-0 right-0 bg-black/30 "
+      show={showSearchModal}
+      enter="transition-opacity duration-75"
+      enterFrom="opacity-0"
+      enterTo="opacity-100"
+      leave="transition-opacity duration-150"
+      leaveFrom="opacity-100"
+      leaveTo="opacity-0"
+      >
+     
         <div className="bg-white rounded-2xl px-4 py-3 shadow-xl w-[600px] mt-20">
           <div className="flex items-center justify-between gap-3 mt-4">
             <div className="flex items-center gap-3">
@@ -849,7 +860,7 @@ export default function POSPage() {
           </div>
 
         </div>
-      </div>
+      </Transition>
       {/* search */}
 
     </div>
