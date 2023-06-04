@@ -113,6 +113,7 @@ export default function CustomersPage() {
   const [showAddModal, setShowAddModal] = useState(false)
   const [showViewCustomerModal, setShowViewCustomerModal] = useState(false);
   const [customers, setCustomers] = useState([])
+  const [searchValue, setSearchValue] = useState("");
 
   const txtCustomerNameRef = useRef(null)
   const txtCustomerPhoneRef = useRef(null)
@@ -306,6 +307,30 @@ export default function CustomersPage() {
   ];
   // data table
 
+  const customerSearchFilter = (customer)=>{
+    const id = customer.dataValues.id;
+    const name = customer.dataValues?.name || "";
+    const phone = customer.dataValues?.phone || "";
+    const email = customer.dataValues?.email || "";
+
+    if(searchValue == "") {
+      return true;
+    }
+    if(searchValue.startsWith("#")) {
+      const searchId = parseInt(searchValue.replace("#", ""));
+      if(!searchId) {
+        return true;
+      }
+      return id == searchId;
+    }
+    if(String(name).toLowerCase().includes(searchValue.toLowerCase()) || String(phone).includes(searchValue) || String(email).toLowerCase().includes(searchValue.toLowerCase())) {
+      return true;
+    }
+    return false;
+  };
+
+  const customersFiltered = customers.filter(customerSearchFilter);
+
   return (
     <div className="py-6">
       <div className="px-8 pb-2 flex items-center justify-end gap-4 border-b border-ipos-grey-100">
@@ -317,11 +342,11 @@ export default function CustomersPage() {
           Add Customer
         </button>
 
-        <Search />
+        <Search searchValue={searchValue} setSearchValue={setSearchValue} />
       </div>
 
       <div className="w-full">
-        <DataTable columns={columns} data={customers} pagination responsive sortIcon={<IconArrowDown />} />
+        <DataTable columns={columns} data={customersFiltered} pagination responsive sortIcon={<IconArrowDown />} />
       </div>
 
       {/* modal */}
