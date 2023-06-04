@@ -68,6 +68,7 @@ export default function ExpensesPage() {
 
   const [showAddModal, setShowAddModal] = useState(false)
   const [expenses, setExpenses] = useState([]);
+  const [searchValue, setSearchValue] = useState("");
 
   const txtExpenseNameRef = useRef(null)
   const txtExpenseAmountRef = useRef(null)
@@ -198,6 +199,24 @@ export default function ExpensesPage() {
   ];
   // data table
 
+  const expenseSearchFilter = (expense)=>{
+    const expenseName = expense.dataValues.name;
+
+    if(searchValue == "") {
+      return true;
+    }
+    if(searchValue.startsWith("#")) {
+      const id = parseInt(searchValue.replace("#", ""));
+      if(!id) {
+        return true;
+      }
+      return expense.dataValues.id == id;
+    }
+    return String(expenseName).toLowerCase().includes(searchValue.toLowerCase());
+  };
+
+  const expensesFiltered = expenses.filter(expenseSearchFilter);
+
   return (
     <div className='py-6'>
       <div className="px-8 pb-2 flex items-center justify-end gap-4 border-b border-ipos-grey-100">
@@ -208,12 +227,12 @@ export default function ExpensesPage() {
           Add Expense
         </button>
 
-        <Search />
+        <Search searchValue={searchValue} setSearchValue={setSearchValue} />
       </div>
 
       <div className="w-full">
        
-        <DataTable columns={columns} data={expenses} pagination responsive sortIcon={<IconArrowDown />} />
+        <DataTable columns={columns} data={expensesFiltered} pagination responsive sortIcon={<IconArrowDown />} />
 
       </div>
 
