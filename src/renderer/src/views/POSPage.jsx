@@ -9,6 +9,7 @@ import { DISCOUNT_TYPE } from "../config/discountType.config.js";
 import { calculatePriceAfterTax, calculateTax } from "../utils/calculateTax.js";
 import { TAX_TYPES } from "../config/taxType.config.js";
 import { CUSTOMER_TYPE } from "../config/customerType.config.js";
+import { Transition } from "@headlessui/react";
 
 export default function POSPage() {
 
@@ -30,9 +31,11 @@ export default function POSPage() {
     discountCode: null,
     paymentTypes: [],
     showPaymentMethodModal: false,
-    cart: []
+    cart: [],
+    showSearchModal: false,
   });
 
+  const [searchValue, setSearchValue] = useState("");
 
   const [showEditCartItemQuantity, setShowEditCartItemQuantity] = useState(false);
   const [showApplyDiscountModal, setShowApplyDiscountModal] = useState(false);
@@ -43,7 +46,7 @@ export default function POSPage() {
   const printInvoiceChkRef = useRef(null);
   const paymentTypeRef = useRef(null);
 
-  const { products, categories, category, customers, selectedCustomer, customerList, cart, discount, discountCode, paymentTypes, showPaymentMethodModal } = state;
+  const { products, categories, category, customers, selectedCustomer, customerList, cart, discount, discountCode, paymentTypes, showPaymentMethodModal, showSearchModal } = state;
 
   const netTotal = cart.reduce((pV, cV, index, arr)=>{
     let itemTotal = 0;
@@ -344,6 +347,43 @@ export default function POSPage() {
   // filter
 
 
+  // product search filter
+  const productSearchFilter = (product)=>{
+    const id = product.dataValues.id;
+    const name = product.dataValues.name;
+    const category = product.Category?.dataValues?.name || "";
+    const sku = product.dataValues.sku;
+    const barcode = product.dataValues.barcode;
+
+    if(searchValue == "") {
+      return false;
+    }
+    if(searchValue.startsWith("#")) {
+      const searchId = parseInt(searchValue.replace("#", ""));
+      if(!searchId) {
+        return true;
+      }
+      return id == searchId;
+    }
+    if(String(name).toLowerCase().includes(searchValue.toLowerCase()) || String(category).toLowerCase().includes(searchValue.toLowerCase()) || String(sku).toLowerCase().includes(searchValue.toLowerCase()) || String(barcode).toLowerCase().includes(searchValue.toLowerCase())) {
+      return true;
+    }
+    return false;
+  };
+  const openProductSearchModal = () => {
+    setState({
+      ...state,
+      showSearchModal: true,
+    });
+  }
+  const closeProductSearchModal = () => {
+    setState({
+      ...state,
+      showSearchModal: false,
+    });
+  }
+  // product search filter
+
   return (
     <div className="px-8 py-6 w-full flex gap-6">
       {/* all items */}
@@ -355,7 +395,7 @@ export default function POSPage() {
             <button onClick={openCategoryFilterModal}>
               <IconFilter />
             </button>
-            <button>
+            <button onClick={openProductSearchModal}>
               <IconSearch />
             </button>
           </div>
@@ -721,6 +761,107 @@ export default function POSPage() {
         </div>
       </div>
       {/* sale payment type */}
+
+
+      {/* search */}
+      <Transition
+      className="w-full h-screen flex items-start justify-center fixed top-0 left-0 right-0 bg-black/30 "
+      show={showSearchModal}
+      enter="transition-opacity duration-75"
+      enterFrom="opacity-0"
+      enterTo="opacity-100"
+      leave="transition-opacity duration-150"
+      leaveFrom="opacity-100"
+      leaveTo="opacity-0"
+      >
+     
+        <div className="bg-white rounded-2xl px-4 py-3 shadow-xl w-[600px] mt-20">
+          <div className="flex items-center justify-between gap-3 mt-4">
+            <div className="flex items-center gap-3">
+              <button
+                onClick={closeProductSearchModal}
+                className="w-12 h-12 flex items-center justify-center rounded-2xl bg-ipos-grey-50 hover:bg-ipos-grey-100 text-ipos-grey"
+              >
+                <IconX />
+              </button>
+              <h3>Search</h3>
+            </div>
+          </div>
+
+          <div className="mt-4">
+            {/* search input */}
+            <div className='hover:cursor-pointer no-drag flex items-center justify-between gap-2 bg-ipos-grey-50 text-ipos-grey rounded-2xl px-4'>
+              <div className='flex items-center gap-2 w-full'>
+                <IconSearch />
+                <input 
+                  type="text" 
+                  value={searchValue} 
+                  onChange={e=>setSearchValue(e.target.value)} 
+                  placeholder='Search Products' 
+                  className='bg-ipos-grey-50 text-ipos-grey py-4 outline-none grow' 
+                />
+              </div>
+            </div>
+            {/* search input */}
+
+            {/* result */}
+            <div className="flex flex-col gap-4 mt-4 max-h-80 overflow-y-scroll show-scrollbar">
+              {
+                products.filter(productSearchFilter).map((product, index)=>{
+                  const id = product.dataValues.id;
+                  const name = product.dataValues.name;
+                  const category = product.Category?.dataValues?.name || "";
+                  const sku = product.dataValues.sku;
+                  const barcode = product.dataValues.barcode;
+
+                  const price = product.dataValues.price;
+                  const productImage = product.dataValues.image;
+
+                  // price + tax
+                  const taxRate = product?.Tax?.dataValues?.taxRate || 0;
+                  const taxType = product?.Tax?.dataValues?.type || null;
+
+                  const calculatedTax = calculateTax(price, taxRate, taxType);
+                  const priceAfterTax = calculatePriceAfterTax(price, taxRate, taxType);
+                  // price + tax
+
+                  return <div key={index} className="flex items-center justify-between">
+                    <div className="flex gap-2">
+                      <div className="w-16 h-16 rounded-2xl border">
+                        {
+                          productImage !== undefined && productImage !== null && productImage !== "" 
+                          ? <img src={productImage} alt="product img" className='w-full h-full rounded-2xl object-cover' /> 
+                          : <div className='w-full h-full rounded-2xl flex items-center justify-center bg-gray-100 text-gray-400'>
+                            {name.toUpperCase()}
+                          </div>
+                        }
+                      </div>
+
+                      <div>
+                        <p className="text-sm text-ipos-grey">#{id}</p>
+                        <p className="text-sm">{name} <span className="text-ipos-grey text-xs">(in {category})</span></p>
+                        <p className="text-sm">{currencySymbol}{priceAfterTax}</p>
+                      </div>
+                    </div>
+
+                    <button 
+                      onClick={()=>{
+                        btnPOSItemTap({id: id, name, price:price, tax: calculatedTax, priceAfterTax: priceAfterTax, taxType});
+                      }}
+                      className="flex gap-2 items-center justify-center bg-gray-100 hover:bg-gray-200 text-gray-500 px-4 py-3 mr-2 rounded-2xl text-sm">
+                      <IconPlus />
+                      Add
+                    </button>
+                  </div>
+                })
+              }
+            </div>
+            {/* result */}
+          </div>
+
+        </div>
+      </Transition>
+      {/* search */}
 
     </div>
   );
