@@ -52,6 +52,7 @@ function OptionsMenu({onBtnDelete}) {
 export default function DiscountPage() {
   const [showAddModal, setShowAddModal] = useState(false)
   const [discounts, setDiscountes] = useState([])
+  const [searchValue, setSearchValue] = useState("");
 
   const txtDiscountCodeRef = useRef(null)
   const txtDiscountValueRef = useRef(null)
@@ -124,6 +125,15 @@ export default function DiscountPage() {
     }
   };
 
+  const discountSearchFilter = (discount)=>{
+    const discountCode = discount.dataValues.discountCode;
+
+    if(searchValue == "") {
+      return true;
+    }
+    return String(discountCode).toLowerCase().includes(searchValue.toLowerCase());
+  };
+
   return (
     <div className="py-6">
       <div className="px-8 pb-2 flex items-center justify-end gap-4 border-b border-ipos-grey-100">
@@ -135,7 +145,7 @@ export default function DiscountPage() {
           Add Discount
         </button>
 
-        <Search />
+        <Search searchValue={searchValue} setSearchValue={setSearchValue} />
       </div>
 
       <div className="w-full">
@@ -150,7 +160,9 @@ export default function DiscountPage() {
             </tr>
           </thead>
           <tbody>
-            {discounts.map((discount, index) => {
+            {discounts
+            .filter(discountSearchFilter)
+            .map((discount, index) => {
               const discountCode = discount.dataValues.discountCode;
               const discountValue =  discount.dataValues.discountValue;
               const discountType =  discount.dataValues.discountType;
