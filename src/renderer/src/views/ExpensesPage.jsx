@@ -177,7 +177,7 @@ export default function ExpensesPage() {
     },
     {
       name: "Date",
-      selector: row => new Date(row.dataValues.date).toLocaleString(),
+      selector: row => new Date(row.dataValues.date).toDateString(),
       width: "200px",
       sortable: true,
     },

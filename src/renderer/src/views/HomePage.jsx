@@ -6,7 +6,7 @@ export default function HomePage() {
   return (
     <div className='px-8 py-6'>
       <div className='fixed right-8 top-6'>
-        <Search />
+        {/* <Search /> */}
       </div>
       <h1 className='text-3xl mt-20'>
         Welcome 👋
