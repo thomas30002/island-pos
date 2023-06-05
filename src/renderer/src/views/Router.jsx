@@ -18,7 +18,14 @@ import SettingReceiptPage from "./settings_pages/Receipt.jsx";
 import SettingTaxesPage from "./settings_pages/Taxes.jsx";
 import SettingDiningOptionsPage from "./settings_pages/DiningOptions.jsx";
 
-
+import SalesSummaryPage from "./reports_pages/SalesSummaryPage.jsx";
+import SalesByItemPage from './reports_pages/SalesByItemPage.jsx';
+import SalesByCategoryPage from "./reports_pages/SalesByCategoryPage.jsx";
+import SalesByPaymentTypesPage from "./reports_pages/SalesByPaymentTypesPage.jsx";
+import SalesByCustomersPage from "./reports_pages/SalesByCustomersPage.jsx";
+import ReportsReceiptsPage from "./reports_pages/ReceiptsPage.jsx";
+import ReportDiscountPage from "./reports_pages/DiscountsPage.jsx";
+import ReportsTaxesPage from "./reports_pages/TaxesPage.jsx";
 
 export default function RouterPage() {
   return (
@@ -34,7 +41,17 @@ export default function RouterPage() {
             <Route path='customers' element={<CustomersPage />} />
             <Route path='expenses' element={<ExpensesPage />} />
             <Route path='discount' element={<DiscountPage />} />
-            <Route path='reports' element={<ReportsPage />} />
+            <Route path='reports' element={<ReportsPage />}>
+              <Route path='' element={<SalesSummaryPage />} />
+              <Route path='sales-summary' element={<SalesSummaryPage />} />
+              <Route path='sales-item' element={<SalesByItemPage />} />
+              <Route path='sales-category' element={<SalesByCategoryPage />} />
+              <Route path='sales-payment-type' element={<SalesByPaymentTypesPage />} />
+              <Route path='sales-customers' element={<SalesByCustomersPage />} />
+              <Route path='receipts' element={<ReportsReceiptsPage />} />
+              <Route path='discounts' element={<ReportDiscountPage />} />
+              <Route path='taxes' element={<ReportsTaxesPage />} />
+            </Route>
             <Route path='settings' element={<SettingsPage />} >
               <Route path='' element={<SettingFeaturesPage />} />
               <Route path='features' element={<SettingFeaturesPage />} />
