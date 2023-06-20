@@ -64,7 +64,7 @@ export default function ReceiptsPage() {
  return (
    <div className='px-8 py-6 w-full'>
      <div className="flex justify-between items-center">
-      <h3>Sales By Receipts</h3>
+      <h3>Receipts</h3>
       <Search searchValue='' setSearchValue={()=>{}} />
      </div>
 
