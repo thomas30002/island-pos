@@ -8,7 +8,7 @@ import {
   Title,
   Tooltip,
   Filler,
-  Legend,
+  Legend, Colors
 } from 'chart.js';
 import { Line } from 'react-chartjs-2';
 import DataTable from 'react-data-table-component';
@@ -23,7 +23,8 @@ ChartJS.register(
   Title,
   Tooltip,
   Filler,
-  Legend
+  Legend,
+  Colors
 );
 
 export default function SalesSummaryPage() {
