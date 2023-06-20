@@ -1,6 +1,8 @@
 import React from 'react'
 
 export default function SalesSummaryPage() {
+
+
   return (
     <div className='px-8 py-6 w-full'>
       <h3>Sales Summary</h3>
@@ -14,6 +16,12 @@ export default function SalesSummaryPage() {
         <div>
           <label htmlFor="todate" className='block'>To Date</label>
           <input type="date" name="todate" id="todate" className='block w-60 outline-none text-ipos-grey bg-ipos-grey-50 px-4 py-3 rounded-2xl mt-2' />
+        </div>
+      </div>
+
+      <div className="mt-8">
+        <div className="w-full h-96">
+          
         </div>
       </div>
     </div>
