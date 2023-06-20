@@ -35,7 +35,7 @@ const navbarItems = [
     icon: <IconDiscount2 />
   },
   {
-    path: "/reports",
+    path: "/reports/sales-summary",
     text: "Reports",
     icon: <IconChartAreaLine />
   },
