@@ -8,7 +8,7 @@ export default function ReportsPage() {
       <div>
         <ReportsNavbar />
       </div>
-      <div className='w-full'>
+      <div className='w-full h-screen overflow-y-scroll'>
         <Outlet />
       </div>
     </div>
