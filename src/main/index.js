@@ -1,4 +1,4 @@
-import { app, shell, BrowserWindow } from 'electron'
+import { app, shell, BrowserWindow, ipcMain } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
@@ -18,6 +18,13 @@ function createWindow() {
       nodeIntegration: true
     }
   })
+
+  // ipcMain.handle('get-user-path', async (event, ...args) => {
+  //   return app.getPath("userData");
+  // })
+  ipcMain.on('get-user-path', (event, arg)=>{
+    event.returnValue = app.getPath("userData")
+  });
 
   mainWindow.on('ready-to-show', () => {
     mainWindow.show()
