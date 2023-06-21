@@ -112,7 +112,7 @@ export default function SalesSummaryPage() {
     <div className='px-8 py-6 w-full'>
       <h3>Sales Summary</h3>
 
-      <div className="flex gap-4 mt-6">
+      <div className="flex gap-4 mt-6 flex-wrap">
         <div>
           <label htmlFor="fromdate" className='block'>From Date</label>
           <input type="date" name="fromdate" id="fromdate" className='block w-60 outline-none text-ipos-grey bg-ipos-grey-50 px-4 py-3 rounded-2xl mt-2' />
@@ -121,6 +121,15 @@ export default function SalesSummaryPage() {
         <div>
           <label htmlFor="todate" className='block'>To Date</label>
           <input type="date" name="todate" id="todate" className='block w-60 outline-none text-ipos-grey bg-ipos-grey-50 px-4 py-3 rounded-2xl mt-2' />
+        </div>
+
+        <div>
+          <label htmlFor="groupby" className='block'>Group By</label>
+          <select name="groupby" id="groupby" className='block w-60 outline-none text-ipos-grey bg-ipos-grey-50 px-4 py-3 rounded-2xl mt-2'>
+            <option value="day">Day</option>
+            <option value="day">Month</option>
+            <option value="day">Year</option>
+          </select>
         </div>
       </div>
 
