@@ -14,21 +14,27 @@ export default function TaxesPage() {
   // data table
   const columns = [
     {
-      name: "Discount Code",
-      selector: row => row.dataValues.payment_type,
+      name: "Tax Name",
+      selector: row => row.dataValues.name,
       sortable: true,
     },
     {
-      name: "Discounts Applied",
-      selector: row => row.dataValues.discounts_applied,
+      name: "Tax Rate",
+      selector: row => row.dataValues.rate,
       sortable: true,
     },
     {
-      name: "Amount Discounted",
-      selector: row => row.dataValues.amount,
-      format: (row, index) => `${currencySymbol}${row.dataValues.amount}`,
+      name: "Taxable Sales",
+      selector: row => row.dataValues.taxable_sales_amount,
+      format: (row, index) => `${currencySymbol}${row.dataValues.taxable_sales_amount}`,
       sortable: true,
     },
+    {
+     name: "Tax Amount",
+     selector: row => row.dataValues.tax_amount,
+     format: (row, index) => `${currencySymbol}${row.dataValues.tax_amount}`,
+     sortable: true,
+   },
   ];
   const dataTableData = [
     

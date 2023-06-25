@@ -6,8 +6,8 @@ import { Sale, ProductSales } from "../models/sale.model";
 
 export async function addSale(customerType, cartTotal, taxTotal, payableTotal, discountValue, isDiscountApplied, CustomerId, PaymentTypeId, DiscountId, products) {
     const sale = await Sale.create({
-        customerType, cartTotal, taxTotal, payableTotal, discountValue, isDiscountApplied, CustomerId, PaymentTypeId, DiscountId
-    })
+        customerType, cartTotal, taxTotal, payableTotal, discountValue, isDiscountApplied, CustomerId, PaymentTypeId, DiscountDiscountCode: DiscountId,
+    });
 
 
     try {
