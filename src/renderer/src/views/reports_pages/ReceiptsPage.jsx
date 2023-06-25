@@ -1,8 +1,12 @@
 import React, { useEffect, useState } from 'react'
 import DataTable from 'react-data-table-component';
-import { CURRENCIES } from "../../config/currencies.config.js";
 import { IconArrowDown, IconDownload } from '@tabler/icons-react'
+import { Parser } from "@json2csv/plainjs";
+import { saveAs } from "file-saver"
+
+import { CURRENCIES } from "../../config/currencies.config.js";
 import Search from '../../components/Search.jsx';
+import { CUSTOMER_TYPE } from '../../config/customerType.config.js';
 
 
 export default function ReceiptsPage() {
@@ -54,7 +58,7 @@ export default function ReceiptsPage() {
    },
    {
     name: "Customer",
-    selector: row => row.dataValues?.Customer?.dataValues?.name || "",
+    selector: row => row.dataValues?.Customer?.dataValues?.name || CUSTOMER_TYPE.WALKIN,
     sortable: true,
     width: "160px"
   },
@@ -90,6 +94,25 @@ export default function ReceiptsPage() {
  ];
  // data table
 
+  const btnExport = () => {
+    const json = receipts.map(r=>({
+      id: r.dataValues.id,
+      date: new Date(r.dataValues.createdAt).toLocaleString(),
+      Customer: r.dataValues?.Customer?.dataValues?.name || CUSTOMER_TYPE.WALKIN,
+      PaymentMethod: r.dataValues?.PaymentType?.dataValues?.name || "",
+      CartTotal: r.dataValues.cartTotal,
+      tax: r.dataValues.taxTotal,
+      discount: r.dataValues.discountValue,
+      total: r.dataValues.payableTotal
+    }));
+
+    const parser = new Parser();
+    const csv = parser.parse(json);
+
+    var file = new File([csv], "ipos-receipts.csv", {type: "text/csv;charset=utf-8"});
+    saveAs(file);
+  }
+
  return (
    <div className='px-8 py-6 w-full'>
      <div className="flex justify-between items-center">
@@ -109,7 +132,7 @@ export default function ReceiptsPage() {
        </div>
 
        <div>
-         <button className='flex gap-2 items-center outline-none text-ipos-grey bg-ipos-grey-50 hover:bg-ipos-grey-100 px-4 py-3 rounded-2xl'>
+         <button onClick={btnExport} className='flex gap-2 items-center outline-none text-ipos-grey bg-ipos-grey-50 hover:bg-ipos-grey-100 px-4 py-3 rounded-2xl'>
            <IconDownload/>
            Export
          </button>
