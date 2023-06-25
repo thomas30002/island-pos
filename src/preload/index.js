@@ -10,6 +10,7 @@ import { addExpense, getExpenses, removeExpense, updateExpense } from './backend
 import { addCustomer,getCustomer, getCustomers, removeCustomer,updateCustomer } from "./backend/controllers/customer.controller"
 import { addCategory, getCategories, removeCategory, addProduct, getProduct, getProducts, removeProduct, updateProduct } from "./backend/controllers/product.controller"
 import { addSale, getSales, getSale } from "./backend/controllers/sales.controller";
+import { getReportReciepts } from "./backend/controllers/reports.controller";
 
 // Custom APIs for renderer
 const api = {
@@ -67,8 +68,12 @@ const api = {
   // products
 
   // sales
-  addSale, getSales, getSale
+  addSale, getSales, getSale,
   // sales
+
+  // reports
+  getReportReciepts,
+  // reports
 }
 
 // Use `contextBridge` APIs to expose Electron APIs to
