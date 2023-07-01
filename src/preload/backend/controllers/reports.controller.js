@@ -1,5 +1,6 @@
 import { Customer } from "../models/customer.model";
 import { Discount } from "../models/discount.model";
+import { PaymentType } from "../models/paymentTypes.model";
 import { Sale } from "../models/sale.model";
 import { Op, fn, col } from "sequelize";
 // export const getReportSalesByCategory = async () => {
@@ -73,6 +74,34 @@ export const getReportSalesByCustomers = async (fromDate, toDate) => {
             ]
         },
         group: 'CustomerId',
+        order: [[fn('SUM', col('payableTotal')), 'DESC']]
+    });
+
+    return res;
+}
+
+export const getReportSalesByPaymentTypes = async (fromDate, toDate) => {
+    const res = await Sale.findAll({
+        include: PaymentType,
+        attributes: [ 
+            [fn('COUNT', col('PaymentTypeId')), 'transactions'],
+            [fn('SUM', col('payableTotal')), 'amount']
+        ],
+        where: {
+            [Op.and] : [
+                {
+                    createdAt: {
+                        [Op.between]: [fromDate, toDate],
+                    }
+                },
+                {
+                    PaymentTypeId: {
+                        [Op.ne]: null
+                    }
+                }
+            ]
+        },
+        group: 'PaymentTypeId',
         order: [[fn('SUM', col('payableTotal')), 'DESC']]
     });
 
