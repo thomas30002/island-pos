@@ -1,3 +1,4 @@
+import { Customer } from "../models/customer.model";
 import { Discount } from "../models/discount.model";
 import { Sale } from "../models/sale.model";
 import { Op, fn, col } from "sequelize";
@@ -44,6 +45,35 @@ export const getReportDiscounts = async (fromDate, toDate) => {
             ]
         },
         group: 'DiscountDiscountCode'
+    });
+
+    return res;
+}
+
+export const getReportSalesByCustomers = async (fromDate, toDate) => {
+    const res = await Sale.findAll({
+        include: Customer,
+        attributes: [
+            'CustomerId', 
+            // 'name'
+            [fn('SUM', col('payableTotal')), 'total_sales']
+        ],
+        where: {
+            [Op.and] : [
+                {
+                    createdAt: {
+                        [Op.between]: [fromDate, toDate],
+                    }
+                },
+                {
+                    customerType: {
+                        [Op.ne]: "WALKIN"
+                    }
+                }
+            ]
+        },
+        group: 'CustomerId',
+        order: [[fn('SUM', col('payableTotal')), 'DESC']]
     });
 
     return res;
