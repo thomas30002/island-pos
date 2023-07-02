@@ -132,3 +132,39 @@ export const getReportSalesByItem = async (fromDate, toDate) => {
 
     return res;
 }
+
+export const getReportSalesSummary = async (fromDate, toDate, groupby) => {
+    let groupFn = "%Y-%m-%d";
+
+    if(groupby == "MONTH") {
+        groupFn = "%Y-%m"
+    } else if (groupby == "YEAR") {
+        groupFn = "%Y"
+    } else {
+        groupFn = "%Y-%m-%d"
+    }
+
+    const res = await Sale.findAll({
+        include: [{all: true}],
+        attributes: [ 
+            [ fn('STRFTIME', groupFn, col('Sale.createdAt')) , 'date'],
+            [fn('SUM', col('Sale.payableTotal')), 'gross_sales'],
+            [fn('SUM', col('Sale.discountValue')), 'discount'],
+            [fn('SUM', col('Sale.taxTotal')), 'tax'],
+            [fn('SUM', col('Sale.cartTotal')), 'net_sales'],
+        ],
+        where: {
+            [Op.and] : [
+                {
+                    createdAt: {
+                        [Op.between]: [fromDate, toDate],
+                    }
+                }
+            ]
+        },
+        group: [ fn('STRFTIME', groupFn, col('Sale.createdAt')) ],
+        order: [[fn('DATE', col('Sale.createdAt')), 'DESC']] // groupby: DATE | MONTH | YEAR
+    });
+
+    return res;
+}
