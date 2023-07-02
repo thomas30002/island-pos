@@ -10,10 +10,10 @@ const navbarItems = [
     path: "/reports/sales-item",
     text: "Sales by item",
   },
-  {
-    path: "/reports/sales-category",
-    text: "Sales Category",
-  },
+  // {
+  //   path: "/reports/sales-category",
+  //   text: "Sales Category",
+  // },
   {
     path: "/reports/sales-payment-type",
     text: "Sales by Payment type",
@@ -30,10 +30,10 @@ const navbarItems = [
     path: "/reports/discounts",
     text: "Discounts",
   },
-  {
-    path: "/reports/taxes",
-    text: "Taxes",
-  },
+  // {
+  //   path: "/reports/taxes",
+  //   text: "Taxes",
+  // },
 ];
 
 export default function ReportsNavbar() {

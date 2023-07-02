@@ -109,3 +109,26 @@ export const getReportSalesByPaymentTypes = async (fromDate, toDate) => {
 
     return res;
 }
+
+export const getReportSalesByItem = async (fromDate, toDate) => {
+    const res = await Sale.findAll({
+        include: Product,
+        attributes: [ 
+            [col('Products.id'), 'id'],
+            // [col('Products.name'), 'item']
+            [fn('COUNT', col('Products.id')), 'items_sold'],
+        ],
+        where: {
+            [Op.and] : [
+                {
+                    createdAt: {
+                        [Op.between]: [fromDate, toDate],
+                    }
+                }
+            ]
+        },
+        group: 'Products.id',
+    });
+
+    return res;
+}
