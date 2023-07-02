@@ -1,6 +1,8 @@
+import { Category } from "../models/category.model";
 import { Customer } from "../models/customer.model";
 import { Discount } from "../models/discount.model";
 import { PaymentType } from "../models/paymentTypes.model";
+import { Product } from "../models/product.model";
 import { Sale } from "../models/sale.model";
 import { Op, fn, col } from "sequelize";
 // export const getReportSalesByCategory = async () => {
