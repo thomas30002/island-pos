@@ -114,9 +114,8 @@ export const getReportSalesByItem = async (fromDate, toDate) => {
     const res = await Sale.findAll({
         include: Product,
         attributes: [ 
-            [col('Products.id'), 'id'],
-            // [col('Products.name'), 'item']
-            [fn('COUNT', col('Products.id')), 'items_sold'],
+            [col('Products.ProductSales.ProductId'), 'id'],
+            [fn('SUM', col('Products.ProductSales.quantity')), 'items_sold']
         ],
         where: {
             [Op.and] : [
@@ -127,7 +126,7 @@ export const getReportSalesByItem = async (fromDate, toDate) => {
                 }
             ]
         },
-        group: 'Products.id',
+        group: 'Products.ProductSales.ProductId',
     });
 
     return res;
