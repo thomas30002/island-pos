@@ -4,7 +4,7 @@ import { Discount } from "../models/discount.model";
 import { PaymentType } from "../models/paymentTypes.model";
 import { Product } from "../models/product.model";
 import { Sale } from "../models/sale.model";
-import { Op, fn, col } from "sequelize";
+import { Op, fn, col, where } from "sequelize";
 // export const getReportSalesByCategory = async () => {
 //     const res = await Sale.findAll({
 //         include: [{all: true}],
@@ -167,4 +167,86 @@ export const getReportSalesSummary = async (fromDate, toDate, groupby) => {
     });
 
     return res;
+}
+
+export const getDashboardStats = async () => {
+
+    const today = new Date()
+
+    const todayDate = `${today.getFullYear()}-${(today.getMonth() + 1).toString().padStart(2, 0)}-${today.getDate().toString().padStart(2, 0)}`;
+    const yesterdayDate = `${today.getFullYear()}-${(today.getMonth() + 1).toString().padStart(2, 0)}-${(today.getDate() - 1).toString().padStart(2, 0)}`;
+
+    const monthDate = `${today.getFullYear()}-${(today.getMonth() + 1).toString().padStart(2, 0)}`;
+    const lastMonthDate = `${today.getFullYear()}-${(today.getMonth()).toString().padStart(2, 0)}`;
+
+    const yearDate = `${today.getFullYear()}`;
+    const lastYearDate = `${today.getFullYear()-1}`;
+
+    const todaySaleData = await Sale.findAll({
+        attributes: [ 
+            [fn('SUM', col('Sale.payableTotal')), 'gross_sales'],
+        ],
+        where: where( fn('STRFTIME', "%Y-%m-%d", col('Sale.createdAt')) , Op.eq, todayDate ),
+        group: [ fn('STRFTIME', "%Y-%m-%d", col('Sale.createdAt')) ],
+        limit: 1
+    });
+
+    const yesterdaySaleData = await Sale.findAll({
+        attributes: [ 
+            [fn('SUM', col('Sale.payableTotal')), 'gross_sales'],
+        ],
+        where: where( fn('STRFTIME', "%Y-%m-%d", col('Sale.createdAt')) , Op.eq, yesterdayDate ),
+        group: [ fn('STRFTIME', "%Y-%m-%d", col('Sale.createdAt')) ],
+        limit: 1
+    });
+
+    const monthSaleData = await Sale.findAll({
+        attributes: [ 
+            [fn('SUM', col('Sale.payableTotal')), 'gross_sales'],
+        ],
+        where: where( fn('STRFTIME', "%Y-%m", col('Sale.createdAt')) , Op.eq, monthDate ),
+        group: [ fn('STRFTIME', "%Y-%m", col('Sale.createdAt')) ],
+        limit: 1
+    });
+
+    const lastMonthSaleData = await Sale.findAll({
+        attributes: [ 
+            [fn('SUM', col('Sale.payableTotal')), 'gross_sales'],
+        ],
+        where: where( fn('STRFTIME', "%Y-%m", col('Sale.createdAt')) , Op.eq, lastMonthDate ),
+        group: [ fn('STRFTIME', "%Y-%m", col('Sale.createdAt')) ],
+        limit: 1
+    });
+
+    const yearSaleData = await Sale.findAll({
+        attributes: [ 
+            [fn('SUM', col('Sale.payableTotal')), 'gross_sales'],
+        ],
+        where: where( fn('STRFTIME', "%Y", col('Sale.createdAt')) , Op.eq, yearDate ),
+        group: [ fn('STRFTIME', "%Y", col('Sale.createdAt')) ],
+        limit: 1
+    });
+
+    const lastYearSaleData = await Sale.findAll({
+        attributes: [ 
+            [fn('SUM', col('Sale.payableTotal')), 'gross_sales'],
+        ],
+        where: where( fn('STRFTIME', "%Y", col('Sale.createdAt')) , Op.eq, lastYearDate ),
+        group: [ fn('STRFTIME', "%Y", col('Sale.createdAt')) ],
+        limit: 1
+    });
+
+
+    const data = {
+        today: todaySaleData[0]?.dataValues?.gross_sales || 0,
+        yesterday: yesterdaySaleData[0]?.dataValues?.gross_sales || 0,
+
+        month: monthSaleData[0]?.dataValues?.gross_sales || 0,
+        lastMonth: lastMonthSaleData[0]?.dataValues?.gross_sales || 0,
+
+        year: yearSaleData[0]?.dataValues?.gross_sales || 0,
+        lastYear: lastYearSaleData[0]?.dataValues?.gross_sales || 0,
+    };
+
+    return data;
 }

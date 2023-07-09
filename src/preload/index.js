@@ -10,7 +10,7 @@ import { addExpense, getExpenses, removeExpense, updateExpense } from './backend
 import { addCustomer,getCustomer, getCustomers, removeCustomer,updateCustomer } from "./backend/controllers/customer.controller"
 import { addCategory, getCategories, removeCategory, addProduct, getProduct, getProducts, removeProduct, updateProduct } from "./backend/controllers/product.controller"
 import { addSale, getSales, getSale } from "./backend/controllers/sales.controller";
-import { getReportReciepts, getReportDiscounts, getReportSalesByCustomers, getReportSalesByPaymentTypes, getReportSalesByItem, getReportSalesSummary } from "./backend/controllers/reports.controller";
+import { getReportReciepts, getReportDiscounts, getReportSalesByCustomers, getReportSalesByPaymentTypes, getReportSalesByItem, getReportSalesSummary, getDashboardStats } from "./backend/controllers/reports.controller";
 
 // Custom APIs for renderer
 const api = {
@@ -73,7 +73,7 @@ const api = {
 
   // reports
   getReportReciepts, getReportDiscounts, getReportSalesByCustomers, getReportSalesByPaymentTypes,
-  getReportSalesByItem, getReportSalesSummary,
+  getReportSalesByItem, getReportSalesSummary, getDashboardStats,
   // reports
 }
 
