@@ -1,8 +1,56 @@
-import React from 'react'
-import Search from '../components/Search.jsx'
+import React, { useEffect, useState } from 'react'
 import { IconArrowDownLeft, IconArrowUpRight } from '@tabler/icons-react'
+import { CURRENCIES } from "../config/currencies.config.js";
 
 export default function HomePage() {
+
+  const [data, setData] = useState({
+    today: 0, yesterday: 0, month: 0, lastMonth: 0, year: 0, lastYear: 0,
+    todayUp: 0, monthUp: 0, yearUp: 0
+  })
+
+  useEffect(()=>{
+    _getData();
+  },[]);
+
+  const _getData = async () => {
+    try {
+      const data = await window.api.getDashboardStats();
+
+      const {today, yesterday, month, lastMonth, year, lastYear} = data;
+
+      let todayUp = 0
+      let monthUp = 0
+      let yearUp = 0
+
+      if(yesterday !== 0) {
+        todayUp = Math.round(((today - yesterday) / yesterday) * 100)
+      }
+      if(lastMonth !== 0) {
+        monthUp = Math.round(((month - lastMonth) / lastMonth) * 100)
+      }
+      if(lastYear !== 0) {
+        yearUp = Math.round(((year - lastYear) / lastYear) * 100)
+      }
+
+      setData({
+        ...data,
+        today, yesterday, month, lastMonth, year, lastYear,
+        todayUp, monthUp, yearUp
+      })
+
+    } catch (error) { 
+      console.log(error);
+    }
+  };
+
+  // get currency
+  const currencyCode = window.api.getCurrency();
+  const currencyFind =  CURRENCIES.find(c=>c.cc == currencyCode);
+  const currencySymbol = currencyFind !== undefined ? currencyFind.symbol : '';
+  // get currency
+
+
   return (
     <div className='px-8 py-6'>
       <div className='fixed right-8 top-6'>
@@ -20,15 +68,18 @@ export default function HomePage() {
           <p className='text-sm'>Today Sales</p>
 
           <div className='flex mt-3 justify-between'>
-            <p className='text-3xl font-bold'>₹10,500</p>
+            <p className='text-3xl font-bold'>{currencySymbol}{data.today.toLocaleString()}</p>
             <div className='flex flex-col items-end'>
               <div className='flex items-center text-sm font-bold gap-1'>
-                <div className='w-7 h-7 flex items-center justify-center rounded-full bg-ipos-green-50 text-ipos-green'>
-                  <IconArrowUpRight />
+                <div className={
+                  data.todayUp >= 0 ? 'w-7 h-7 flex items-center justify-center rounded-full bg-ipos-green-50 text-ipos-green':
+                  'w-7 h-7 flex items-center justify-center rounded-full bg-ipos-red-50 text-ipos-red'
+                }>
+                  {data.todayUp >= 0 ? <IconArrowUpRight /> :  <IconArrowDownLeft /> }
                 </div>
-                <p>12%</p>
+                <p>{data.todayUp}%</p>
               </div>
-              <p className="text-xs">from  yesterday</p>
+              <p className="text-xs">from yesterday</p>
             </div>
           </div>
         </div>
@@ -36,18 +87,21 @@ export default function HomePage() {
 
         {/* this week sales */}
         <div className='border border-ipos-grey-100 rounded-2xl px-4 py-3'>
-          <p className='text-sm'>This Week Sales</p>
+          <p className='text-sm'>This Month Sales</p>
 
           <div className='flex mt-3 justify-between'>
-            <p className='text-3xl font-bold'>₹40,100</p>
+            <p className='text-3xl font-bold'>{currencySymbol}{data.month.toLocaleString()}</p>
             <div className='flex flex-col items-end'>
               <div className='flex items-center text-sm font-bold gap-1'>
-                <div className='w-7 h-7 flex items-center justify-center rounded-full bg-ipos-red-50 text-ipos-red'>
-                  <IconArrowDownLeft />
+                <div className={
+                  data.monthUp >= 0 ? 'w-7 h-7 flex items-center justify-center rounded-full bg-ipos-green-50 text-ipos-green':
+                  'w-7 h-7 flex items-center justify-center rounded-full bg-ipos-red-50 text-ipos-red'
+                }>
+                  {data.monthUp >= 0 ? <IconArrowUpRight /> :  <IconArrowDownLeft /> }
                 </div>
-                <p>2%</p>
+                <p>{data.monthUp}%</p>
               </div>
-              <p className="text-xs">from  last week</p>
+              <p className="text-xs">from last month</p>
             </div>
           </div>
         </div>
@@ -55,18 +109,21 @@ export default function HomePage() {
 
         {/* monthly sales */}
         <div className='border border-ipos-grey-100 rounded-2xl px-4 py-3'>
-          <p className='text-sm'>Monthly Sales</p>
+          <p className='text-sm'>Yearly Sales</p>
 
           <div className='flex mt-3 justify-between'>
-            <p className='text-3xl font-bold'>₹1.5L</p>
+            <p className='text-3xl font-bold'>{currencySymbol}{data.year.toLocaleString()}</p>
             <div className='flex flex-col items-end'>
               <div className='flex items-center text-sm font-bold gap-1'>
-                <div className='w-7 h-7 flex items-center justify-center rounded-full bg-ipos-green-50 text-ipos-green'>
-                  <IconArrowUpRight />
+                <div className={
+                  data.yearUp >= 0 ? 'w-7 h-7 flex items-center justify-center rounded-full bg-ipos-green-50 text-ipos-green':
+                  'w-7 h-7 flex items-center justify-center rounded-full bg-ipos-red-50 text-ipos-red'
+                }>
+                  {data.yearUp >= 0 ? <IconArrowUpRight /> :  <IconArrowDownLeft /> }
                 </div>
-                <p>32%</p>
+                <p>{data.yearUp}%</p>
               </div>
-              <p className="text-xs">from  last month</p>
+              <p className="text-xs">from last year</p>
             </div>
           </div>
         </div>
