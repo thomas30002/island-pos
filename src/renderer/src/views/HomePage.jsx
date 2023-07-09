@@ -68,7 +68,7 @@ export default function HomePage() {
           <p className='text-sm'>Today Sales</p>
 
           <div className='flex mt-3 justify-between'>
-            <p className='text-3xl font-bold'>{currencySymbol}{data.today}</p>
+            <p className='text-3xl font-bold'>{currencySymbol}{data.today.toLocaleString()}</p>
             <div className='flex flex-col items-end'>
               <div className='flex items-center text-sm font-bold gap-1'>
                 <div className={
@@ -90,7 +90,7 @@ export default function HomePage() {
           <p className='text-sm'>This Month Sales</p>
 
           <div className='flex mt-3 justify-between'>
-            <p className='text-3xl font-bold'>{currencySymbol}{data.month}</p>
+            <p className='text-3xl font-bold'>{currencySymbol}{data.month.toLocaleString()}</p>
             <div className='flex flex-col items-end'>
               <div className='flex items-center text-sm font-bold gap-1'>
                 <div className={
@@ -112,7 +112,7 @@ export default function HomePage() {
           <p className='text-sm'>Yearly Sales</p>
 
           <div className='flex mt-3 justify-between'>
-            <p className='text-3xl font-bold'>{currencySymbol}{data.year}</p>
+            <p className='text-3xl font-bold'>{currencySymbol}{data.year.toLocaleString()}</p>
             <div className='flex flex-col items-end'>
               <div className='flex items-center text-sm font-bold gap-1'>
                 <div className={
