@@ -11,7 +11,40 @@ import { Op, fn, col, where } from "sequelize";
 //     });
 // };
 
-export const getReportReciepts = async (fromDate, toDate) => {
+export const getReportReciepts = async (fromDate, toDate, searchValue) => {
+   if (new String(searchValue).startsWith("#")) {
+        const recieptId = new String(searchValue).split("#")[1];
+        const res = await Sale.findAll({
+            include: [{all: true}],
+            where: {
+                createdAt: {
+                    [Op.between]: [fromDate, toDate],
+                },
+                id: recieptId
+            },
+            order: [['createdAt', 'DESC']]
+        });
+    
+        return res;
+    } 
+    
+    if (searchValue != "") {
+        const res = await Sale.findAll({
+            include: [{all: true}],
+            where: {
+                createdAt: {
+                    [Op.between]: [fromDate, toDate],
+                },
+                '$Customer.name$': {
+                    [Op.like]: `%${searchValue}%`
+                }
+            },
+            order: [['createdAt', 'DESC']]
+        });
+    
+        return res;
+    }
+
     const res = await Sale.findAll({
         include: [{all: true}],
         where: {
