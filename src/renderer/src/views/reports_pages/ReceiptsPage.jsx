@@ -18,16 +18,18 @@ export default function ReceiptsPage() {
   const [toDate, setToDate] = useState(today);
   const [receipts, setReceipts] = useState([]);
 
+  const [searchValue, setSearchValue] = useState("")
+
   useEffect(()=>{
     _getAllReceipts();
-  },[fromDate, toDate]);
+  },[fromDate, toDate, searchValue]);
 
   const _getAllReceipts = async () => {
     try {
 
       const to = `${toDate.getFullYear()}-${(toDate.getMonth() + 1).toString().padStart(2, 0)}-${toDate.getDate().toString().padStart(2, 0)} 23:59:59`;
 
-      const res = await window.api.getReportReciepts(fromDate, to);
+      const res = await window.api.getReportReciepts(fromDate, to, searchValue);
       console.log(res);
       setReceipts(res);
 
@@ -45,7 +47,7 @@ export default function ReceiptsPage() {
  // data table
  const columns = [
    {
-     name: "ID",
+     name: "#ID",
      selector: row => row.dataValues.id,
      sortable: true,
      width: "70px"
@@ -117,7 +119,7 @@ export default function ReceiptsPage() {
    <div className='px-8 py-6 w-full'>
      <div className="flex justify-between items-center">
       <h3>Receipts</h3>
-      <Search searchValue='' setSearchValue={()=>{}} />
+      <Search searchValue={searchValue} setSearchValue={setSearchValue} />
      </div>
 
      <div className="flex gap-4 mt-6 items-end">
