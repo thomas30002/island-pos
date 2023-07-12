@@ -11,6 +11,18 @@ import { Op, fn, col, where } from "sequelize";
 //     });
 // };
 
+export const getReportRecieptById = async (recieptId) => {
+    const res = await Sale.findAll({
+        include: [{all: true}],
+        where: {
+            id: recieptId
+        },
+        limit: 1,
+    });
+
+    return res;
+}
+
 export const getReportReciepts = async (fromDate, toDate, searchValue) => {
    if (new String(searchValue).startsWith("#")) {
         const recieptId = new String(searchValue).split("#")[1];
