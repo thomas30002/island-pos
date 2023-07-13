@@ -7,6 +7,7 @@ import { saveAs } from "file-saver"
 import { CURRENCIES } from "../../config/currencies.config.js";
 import Search from '../../components/Search.jsx';
 import { CUSTOMER_TYPE } from '../../config/customerType.config.js';
+import { Link } from 'react-router-dom';
 
 
 export default function ReceiptsPage() {
@@ -47,10 +48,13 @@ export default function ReceiptsPage() {
  // data table
  const columns = [
    {
-     name: "#ID",
+     name: "#",
      selector: row => row.dataValues.id,
      sortable: true,
-     width: "70px"
+     width: "70px",
+     cell: (row, index, column, rowid) => {
+      return <Link className='border-b border-b-indigo-500 bg-transparent text-indigo-500' to={`/print-receipt/${row.dataValues.id}`}>{row.dataValues.id}</Link>
+     }
    },
    {
      name: "Date",
