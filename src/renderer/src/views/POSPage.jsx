@@ -10,6 +10,7 @@ import { calculatePriceAfterTax, calculateTax } from "../utils/calculateTax.js";
 import { TAX_TYPES } from "../config/taxType.config.js";
 import { CUSTOMER_TYPE } from "../config/customerType.config.js";
 import { Transition } from "@headlessui/react";
+import { useNavigate } from "react-router-dom";
 
 export default function POSPage() {
 
@@ -18,6 +19,8 @@ export default function POSPage() {
   const currencyFind =  CURRENCIES.find(c=>c.cc == currencyCode);
   const currencySymbol = currencyFind !== undefined ? currencyFind.symbol : '';
   // get currency
+
+  const navigate = useNavigate();
 
   
   const [state, setState] = useState({
@@ -187,7 +190,9 @@ export default function POSPage() {
       
       if(printInvoice) {
         //TODO: print invoice, open new window with the invoice design and run window.print to open print dialog.
-        
+        setTimeout(()=>{
+          navigate(`/print-receipt/${saleId}?print=true`);
+        }, 1000);
       }
 
       // clear cart and dismiss popup
