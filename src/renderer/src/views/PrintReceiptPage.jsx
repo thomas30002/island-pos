@@ -59,6 +59,15 @@ export default function PrintReceiptPage() {
         logo= logoUrl || null;
       }
 
+
+      const doPrint = searchParams.get("print") || false;
+
+      if(doPrint) {
+        setTimeout(()=>{
+          printThis();
+        }, 1000)
+      }
+
       setData({
         ...data,
         loading: false,
