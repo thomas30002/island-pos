@@ -1,6 +1,7 @@
 import { IconChevronLeft, IconPrinter } from '@tabler/icons-react'
 import React, { useEffect, useState } from 'react'
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
+import { CURRENCIES } from '../config/currencies.config'
 
 export default function PrintReceiptPage() {
   const { id } = useParams()
@@ -27,7 +28,9 @@ export default function PrintReceiptPage() {
   const _getData = async () => {
     try {
       const resReceipt = await window.api.getReportRecieptById(id);
-      const currencyFromStorage = window.api.getCurrency();
+      const currencyCode = window.api.getCurrency();
+      const currencyFind =  CURRENCIES.find(c=>c.cc == currencyCode);
+      const currencySymbol = currencyFind !== undefined ? currencyFind.symbol : '';
 
       console.log(resReceipt);
 
@@ -60,7 +63,7 @@ export default function PrintReceiptPage() {
         ...data,
         loading: false,
         
-        currencySymbol: currencyFromStorage,
+        currencySymbol: currencySymbol,
         receipt: resReceipt[0],
         header,
         footer,
@@ -88,7 +91,7 @@ export default function PrintReceiptPage() {
     </div>
   }
 
-  return <div className='w-full'>
+  return <div className='w-full print:text-sm'>
     
     <div className="flex justify-between items-center px-8 py-12 print:hidden">
       <div className='flex items-center gap-4'>
@@ -112,29 +115,101 @@ export default function PrintReceiptPage() {
 
       {/* logo */}
       <div>
-        {data.logo != null && data.logo != "" ? <img src={data.logo} alt="logo" /> : <></>}
+        {data.logo != null && data.logo != "" ? <img src={data.logo} alt="logo" className='h-12 object-contain' /> : <></>}
       </div>
 
       {/* header */}
-      <div>
+      <div className='mt-4'>
+        <pre>
         {data.header}
+        </pre>
       </div>
 
+      <div className="border-b"></div>
+
       {/* customer info: id, name, address, email, phone */}
+      {
+        data.showCustomerInfo ? <div className='my-4'>
+        <pre>
+Customer Name     : {data.receipt?.dataValues?.Customer?.dataValues?.name || ""} (#{data.receipt?.dataValues?.Customer?.dataValues?.id || ""})<br/>
+Customer Address: : {data.receipt?.dataValues?.Customer?.dataValues?.address || ""}<br/>
+Custoemr Email:   : {data.receipt?.dataValues?.Customer?.dataValues?.email || ""}<br/>
+Customer Phone    : {data.receipt?.dataValues?.Customer?.dataValues?.phone || ""}<br/>
+        </pre>
+      </div>:<></>
+      }
 
-      {/* payment method */}
-      {/* receipt id, date */}
+      <div className="border-b"></div>
 
-      {/* payable total total */}
-      {/* cart total */}
-      {/* tax total */}
-      {/* discount */}
+      <div className="my-4">
+        <pre>
+Receipt ID     : {data.receipt.dataValues?.id || ""}<br/>
+Date           : {data.receipt.dataValues?.createdAt?.toLocaleString() || ""}<br/>
+Payment Method : {data.receipt.dataValues?.PaymentType?.dataValues?.name || ""}<br/>
+        </pre>
+      </div>
+
+      <div className="border-b"></div>
 
       {/* items */}
+      <div className="my-4 font-mono flex gap-4">
+        <div>
+          <table className="border border-collapse">
+            <tr>
+              <td className='border p-2'>#</td>
+              <td className='border p-2'>Item</td>
+              <td className='border p-2'>Qty</td>
+              <td className='border p-2 max-w-[140px] text-right'>Total (Exclusive of Tax)</td>
+            </tr>
+            {
+              data.receipt?.dataValues?.Products?.map((product, i, products)=>{
+
+                const itemName = product?.dataValues?.name || "";
+                const itemPrice = product?.dataValues?.price || 0;
+                const TaxId = product?.dataValues?.TaxId || null;
+                const qty = product?.dataValues?.ProductSales?.dataValues?.quantity || 1;
+                const itemTotal  = itemPrice * qty;
+
+                return <tr>
+                  <td className="border p-2 text-right">{i+1}</td>
+                  <td className="border p-2">{itemName}</td>
+                  <td className="border p-2 text-right">{qty}</td>
+                  <td className="border p-2 text-right">{data.currencySymbol}{itemTotal.toLocaleString()}/-</td>
+                </tr>
+              })
+            }
+          </table>
+        </div>
+        <div>
+          <table className='border border-collapse'>
+            <tr>
+              <td className='border p-2'>Cart Total</td>
+              <td className='border p-2 text-right'>{data.currencySymbol}{data.receipt.dataValues?.cartTotal?.toLocaleString() || "0"}/-</td>
+            </tr>
+            <tr>
+              <td className='border p-2'>Tax Total</td>
+              <td className='border p-2 text-right'>{data.currencySymbol}{data.receipt.dataValues?.taxTotal?.toLocaleString() || "0"}/-</td>
+            </tr>
+            <tr>
+              <td className='border p-2'>Discount</td>
+              <td className='border p-2 text-right'>{data.currencySymbol}{data.receipt.dataValues?.discountValue?.toLocaleString() || "0"}/-</td>
+            </tr>
+            <tr>
+              <td className='border p-2'>Payable Total</td>
+              <td className='border p-2 text-right font-bold'>{data.currencySymbol}{data.receipt.dataValues?.payableTotal?.toLocaleString() || "0"}/-</td>
+            </tr>
+          </table>
+        </div>
+        
+      </div>
 
       {/* footer */}
-      <div>
+      <div className="border-b"></div>
+
+      <div className='mt-4'>
+        <pre>
         {data.footer}
+        </pre>
       </div>
 
 
