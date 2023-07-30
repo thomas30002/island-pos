@@ -261,7 +261,7 @@ export default function ProductsPage() {
   };
 
   const onBtnPrintQR = async () => {
-
+    navigate('/print-product-codes')
   };
 
   const onBtnExport = async () => {
