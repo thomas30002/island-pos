@@ -27,6 +27,7 @@ import ReportsReceiptsPage from "./reports_pages/ReceiptsPage.jsx";
 import ReportDiscountPage from "./reports_pages/DiscountsPage.jsx";
 import ReportsTaxesPage from "./reports_pages/TaxesPage.jsx";
 import PrintReceiptPage from './PrintReceiptPage.jsx';
+import PrintProductCodesPage from './PrintProductCodesPage.jsx';
 
 export default function RouterPage() {
   return (
@@ -65,6 +66,7 @@ export default function RouterPage() {
           </Route>
 
           <Route path='/print-receipt/:id' element={<PrintReceiptPage />} />
+          <Route path='/print-product-codes' element={<PrintProductCodesPage />} />
         </Routes>
       </HashRouter>
     </div>
