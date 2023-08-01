@@ -10,6 +10,8 @@ files:
   - '!{.env,.env.*,.npmrc,pnpm-lock.yaml}'
 asarUnpack:
   - resources/**
+  - node_modules/sqlite3
+  - out/main/chunks/*.node
 afterSign: build/notarize.js
 win:
   executableName: ipos

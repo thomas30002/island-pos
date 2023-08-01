@@ -43,7 +43,7 @@ export const saveReceiptSettings = async ({header, footer, showCustomerInfo, sho
 
 
 export const getCurrency = () => {
-    const currency = localStorage.getItem(CURRENCY_SETTING_KEY) || "";
+    const currency = localStorage.getItem(CURRENCY_SETTING_KEY) || "INR";
     return currency;
 }
 
