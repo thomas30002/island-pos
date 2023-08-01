@@ -49,7 +49,7 @@ function OptionsMenu({onBtnPrintQR, onBtnExport, onBtnImport}) {
           )}
         </Menu.Item>
       </div>
-      <div className="py-1">
+      {/* <div className="py-1">
         <Menu.Item>
           {({ active }) => (
             <button
@@ -80,7 +80,7 @@ function OptionsMenu({onBtnPrintQR, onBtnExport, onBtnImport}) {
             </button>
           )}
         </Menu.Item>
-      </div>
+      </div> */}
     </Menu.Items>
   </Transition>
 </Menu>;

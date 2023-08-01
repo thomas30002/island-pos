@@ -100,7 +100,7 @@ export default function Features() {
         {/* dining options */}
 
         {/* backup */}
-        <div className='flex gap-4 justify-between items-center pt-4'>
+        {/* <div className='flex gap-4 justify-between items-center pt-4'>
           <div className='flex gap-4'>
             <div>
               <IconDatabaseExport />
@@ -117,11 +117,11 @@ export default function Features() {
               Backup
             </button>
           </div>
-        </div>
+        </div> */}
         {/* backup */}
 
         {/* restore */}
-        <div className='flex gap-4 justify-between items-center pt-4'>
+        {/* <div className='flex gap-4 justify-between items-center pt-4'>
           <div className='flex gap-4'>
             <div>
               <IconDatabaseImport />
@@ -138,7 +138,7 @@ export default function Features() {
               Restore
             </button>
           </div>
-        </div>
+        </div> */}
         {/* backup */}
 
       </div>
